@@ -10,7 +10,6 @@ class MenuWidget(QListWidget):
         super().__init__()
         self.setFixedWidth(300)
         self.addItem(QListWidgetItem("Dashboard"))
-        #self.addItem(QListWidgetItem("Test"))
         self.setCurrentRow(0)
         self.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.setStyleSheet("""
@@ -43,7 +42,6 @@ class Panel(QWidget):
         self.stacked_widget = stacked_widget
 
         self.menu.currentRowChanged.connect(self.change_page)
-
 
         container = QWidget()
 
