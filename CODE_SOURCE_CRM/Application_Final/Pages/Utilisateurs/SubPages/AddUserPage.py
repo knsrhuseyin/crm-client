@@ -30,7 +30,6 @@ class AddUserPage(QWidget):
             }
         """)
         container_layout.addWidget(title, 0)
-        #container_layout.addStretch()
 
         self.name = QLineEdit()
         self.first_name = QLineEdit()
@@ -54,8 +53,6 @@ class AddUserPage(QWidget):
             }
         """)
         container_layout.addWidget(self.info_label)
-
-        #container_layout.addStretch()
 
         self.add_button = QPushButton("Ajouter l'utilisateur")
         self.add_button.clicked.connect(lambda: asyncio.create_task(self.add_user_to_database()))
