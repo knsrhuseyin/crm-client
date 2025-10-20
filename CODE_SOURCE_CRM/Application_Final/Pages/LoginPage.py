@@ -11,7 +11,6 @@ from CODE_SOURCE_CRM.Application_Final.Pages.Panel import AdminPanel
 from CODE_SOURCE_CRM.Database.database import DataBase
 
 
-# login window CHATGPT
 class LoginWindow(QWidget):
     def __init__(self, api: CrmApiAsync):
         super().__init__()
@@ -74,8 +73,6 @@ class LoginWindow(QWidget):
         self.password_input.setEchoMode(QLineEdit.EchoMode.Password)
         self.password_input.setStyleSheet(self.input_style())
 
-        #form_layout.addRow("Email", )
-        #form_layout.addRow("Mot de passe", self.password_input)
         form_layout.addWidget(self.email_input)
         form_layout.addWidget(self.password_input)
         card_layout.addLayout(form_layout)
