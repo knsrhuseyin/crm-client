@@ -328,16 +328,3 @@ class CrmApiAsync:
         except ClientResponseError as e:
             print(e)
             return True
-
-
-
-test = CrmApiAsync("https://api-crm.knsr-family.com")
-async def test_async():
-    await test.login("root@gmail.com", "85xpkm#izRjYcjNT")
-    response = await test.delete_user(15)
-    print(response)
-    #print(token)
-
-test_1 = asyncio.run(test.get_user(10))
-print(test_1, "ce machin")
-print(asyncio.run(test.get_current_user_access()))
