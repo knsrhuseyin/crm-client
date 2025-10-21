@@ -2,7 +2,7 @@ import asyncio
 import json
 
 from PySide6.QtCore import Qt
-from PySide6.QtGui import QPalette, QColor, QFont
+from PySide6.QtGui import QPalette, QColor, QFont, QGuiApplication
 from PySide6.QtWidgets import QWidget, QVBoxLayout, QLabel, QLineEdit, QSizePolicy, QPushButton, QFormLayout, QCheckBox, \
     QSpacerItem, QFrame
 
@@ -19,6 +19,7 @@ class LoginWindow(QWidget):
     def init_ui(self):
         self.setWindowTitle("Connexion")
         self.resize(1280, 720)
+        self.center_on_screen()
 
         # 🌌 Thème général bleu sombre
         palette = QPalette()
@@ -147,6 +148,12 @@ class LoginWindow(QWidget):
                 background-color: #2C74B3;
             }
         """
+
+    def center_on_screen(self):
+        screen = QGuiApplication.primaryScreen().availableGeometry()
+        x = (screen.width() - self.width()) // 2
+        y = (screen.height() - self.height()) // 2
+        self.move(x, y)
 
     async def login(self):
         username = self.email_input.text()

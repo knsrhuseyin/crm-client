@@ -1,7 +1,7 @@
 import asyncio
 
 from PySide6.QtCore import Qt
-from PySide6.QtGui import QStandardItem
+from PySide6.QtGui import QStandardItem, QGuiApplication
 from PySide6.QtWidgets import QWidget, QVBoxLayout, QLabel, QTreeView
 
 from CRM_API import CrmApiAsync
@@ -72,11 +72,10 @@ class ViewUserPage(QWidget):
 
         self.setLayout(layout)
 
-
     async def integer_users(self):
         users_data = await self.api.get_all_users()
-        print(users_data, "L.78, ViewUserPage.py")
-        await asyncio.sleep(0.5)
+        if "err" in users_data:
+            users_data = await self.api.get_all_users()
         for user in users_data:
             print(user, "L.80, ViewUserPage.py")
             users = [

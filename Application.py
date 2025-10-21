@@ -5,6 +5,7 @@ from json import JSONDecodeError
 
 import qasync
 from PySide6.QtCore import Qt, QTimer
+from PySide6.QtGui import QGuiApplication
 from PySide6.QtWidgets import QApplication, QWidget, QLabel, QVBoxLayout
 from CRM_API import CrmApiAsync
 from Pages.LoginPage import LoginWindow
@@ -15,7 +16,8 @@ class SplashScreen(QWidget):
         super().__init__()
         self.api = api
         self.setWindowTitle("Chargement...")
-        self.setFixedSize(300, 150)
+        self.resize(300, 150)
+        self.center_on_screen()
         self.setWindowFlags(Qt.WindowType.FramelessWindowHint | Qt.WindowType.WindowStaysOnTopHint)
         self.setStyleSheet("background-color: #222; color: white;")
         self.label = QLabel("🔄 Vérification de la session...", alignment=Qt.AlignmentFlag.AlignCenter)
@@ -47,6 +49,12 @@ class SplashScreen(QWidget):
         else:
             self.open_login()
 
+    def center_on_screen(self):
+        screen = QGuiApplication.primaryScreen().availableGeometry()
+        x = (screen.width() - self.width()) // 2
+        y = (screen.height() - self.height()) // 2
+        self.move(x, y)
+
     def open_admin(self):
         self.main = AdminPanel(self.api)
         self.main.show()
@@ -56,6 +64,7 @@ class SplashScreen(QWidget):
         self.login_page = LoginWindow(self.api)
         self.login_page.show()
         self.close()
+
 
 
 

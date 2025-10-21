@@ -1,4 +1,5 @@
 from PySide6.QtCore import Qt
+from PySide6.QtGui import QGuiApplication
 from PySide6.QtWidgets import QWidget, QVBoxLayout, QLabel, QSizePolicy, QStackedWidget, QHBoxLayout, QListWidgetItem, \
     QListWidget
 
@@ -17,19 +18,21 @@ class MenuWidget(QListWidget):
                 margin: 10;
                 border-radius: 2px;
                 font-size: 20px;
+                color: white;
             }
             QListWidget::item {
                 padding: 15;
-
             }
             QListWidget::item:hover {
                 background: #0A1330;
+                color:white
             }
             QListWidget::item:selected {
                 background: #0A1330;
                 border-left: 2px solid;
                 border-color: #CB3CFF;
                 font-weight: bold;
+                color: white;
             }
         """)
 
@@ -81,6 +84,7 @@ class AdminPanel(QWidget):
     def __init__(self, api: CrmApiAsync):
         super().__init__()
         self.resize(1280, 720)
+        self.center_on_screen()
 
         self.pages = QStackedWidget()
         self.pages.addWidget(UserManagement(api, self))
@@ -94,3 +98,9 @@ class AdminPanel(QWidget):
         layout.setSpacing(0)
 
         self.setLayout(layout)
+
+    def center_on_screen(self):
+        screen = QGuiApplication.primaryScreen().availableGeometry()
+        x = (screen.width() - self.width()) // 2
+        y = (screen.height() - self.height()) // 2
+        self.move(x, y)
