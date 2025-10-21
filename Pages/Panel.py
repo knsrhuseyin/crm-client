@@ -4,7 +4,7 @@ from PySide6.QtWidgets import QWidget, QVBoxLayout, QLabel, QSizePolicy, QStacke
     QListWidget
 
 from CRM_API import CrmApiAsync
-from Pages.Utilisateurs.Users_Page import UserManagement
+from Pages.UsersPages.Users_Page import UserManagement
 
 class MenuWidget(QListWidget):
     def __init__(self):

@@ -2,8 +2,8 @@ from PySide6.QtGui import QStandardItemModel
 from PySide6.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QTabWidget
 
 from CRM_API import CrmApiAsync
-from Pages.Utilisateurs.SubPages.AddUserPage import AddUserPage
-from Pages.Utilisateurs.SubPages.ViewUsersPage import ViewUserPage
+from Pages.UsersPages.SubPages.AddUserPage import AddUserPage
+from Pages.UsersPages.SubPages.ViewUsersPage import ViewUserPage
 
 
 class UserManagement(QWidget):
@@ -25,7 +25,7 @@ class UserManagement(QWidget):
         layout_tab_widget.setContentsMargins(0, 0, 0, 0)
 
         self.onglets = QTabWidget()
-        self.onglets.addTab(ViewUserPage(self.api, self.model), "Utilisateurs")
+        self.onglets.addTab(ViewUserPage(self.api, self.model), "UsersPages")
         self.onglets.addTab(AddUserPage(self.api, self.model, self.admin_panel), "Ajouter un utilisateur")
         self.onglets.setStyleSheet("""
             QTabBar {
