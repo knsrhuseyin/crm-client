@@ -1,8 +1,10 @@
 auth.json
 token.json
-.venv
-.idea
-__pycache__
-Pages/__pycache__
-Pages/Utilisateurs/__pycache__
-Pages/Utilisateurs/SubPages/__pycache
+.venv/
+.idea/
+__pycache__/
+*.py[codz]
+*$py.class
+Pages/__pycache__/
+Pages/Utilisateurs/__pycache__/
+Pages/Utilisateurs/SubPages/__pycache/
