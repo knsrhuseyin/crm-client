@@ -6,7 +6,7 @@ from json import JSONDecodeError
 import qasync
 from PySide6.QtCore import Qt, QTimer
 from PySide6.QtGui import QGuiApplication
-from PySide6.QtWidgets import QApplication, QWidget, QLabel, QVBoxLayout
+from PySide6.QtWidgets import QApplication, QWidget, QLabel, QVBoxLayout, QProgressBar
 from CRM_API import CrmApiAsync
 from Pages.LoginPage import LoginWindow
 from Pages.Panel import AdminPanel
@@ -21,32 +21,39 @@ class SplashScreen(QWidget):
         self.setWindowFlags(Qt.WindowType.FramelessWindowHint | Qt.WindowType.WindowStaysOnTopHint)
         self.setStyleSheet("background-color: #222; color: white;")
         self.label = QLabel("🔄 Vérification de la session...", alignment=Qt.AlignmentFlag.AlignCenter)
+        self.progress_bar = QProgressBar()
         layout = QVBoxLayout(self)
         layout.addWidget(self.label)
+        layout.addWidget(self.progress_bar)
 
         # Lance la vérification sans bloquer
         QTimer.singleShot(0, lambda: asyncio.create_task(self.verify_session()))
 
     async def verify_session(self):
-        is_authenticated = await self.api.get_current_user_access()
-        await asyncio.sleep(0.5)  # pour garder l’effet visuel du splash
+        async def fake_progress():
+            for i in range(1, 91):
+                await asyncio.sleep(0.02)
+                self.progress_bar.setValue(i)
 
-        if is_authenticated:
+        fake_task = asyncio.create_task(fake_progress())
+
+        connexion = await self.api.get_current_user_access(progress_callback=self.progress_bar.setValue)
+        verify_connexion = await self.api.verify_request(connexion, "auth.json")
+
+        fake_task.cancel()
+        self.progress_bar.setValue(100)
+
+        await asyncio.sleep(0.3)
+
+        if verify_connexion == self.api.Ok:
             self.open_admin()
-            print("ici")
-        elif os.path.exists("auth.json"):
-            with open("auth.json", 'r') as f:
-                try:
-                    login = json.load(f)
-                except JSONDecodeError as e:
-                    print(e)
-                    self.open_login()
-            if await self.api.login(login["username"], login["password"]):
-                self.open_admin()
-            else:
-                print("Les informations de connexions sont fausses.")
-                os.remove("auth.json")
-        else:
+        elif verify_connexion == self.api.UserReconnected:
+            await self.verify_session()
+        elif verify_connexion == self.api.AccessTokenError:
+            self.open_login()
+        elif verify_connexion == self.api.OtherError:
+            self.open_login()
+        elif verify_connexion == self.api.ErrorNotFound:
             self.open_login()
 
     def center_on_screen(self):

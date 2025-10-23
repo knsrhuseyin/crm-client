@@ -11,8 +11,8 @@ class UserManagement(QWidget):
         super().__init__()
         self.api = api
         self.users = []
-        self.model = QStandardItemModel()
         self.admin_panel = admin_panel
+        self.view_user_page = ViewUserPage(self.api)
 
         container = QWidget()
 
@@ -25,8 +25,8 @@ class UserManagement(QWidget):
         layout_tab_widget.setContentsMargins(0, 0, 0, 0)
 
         self.onglets = QTabWidget()
-        self.onglets.addTab(ViewUserPage(self.api, self.model), "UsersPages")
-        self.onglets.addTab(AddUserPage(self.api, self.model, self.admin_panel), "Ajouter un utilisateur")
+        self.onglets.addTab(self.view_user_page, "UsersPages")
+        self.onglets.addTab(AddUserPage(self.api, self.view_user_page, self.admin_panel), "Ajouter un utilisateur")
         self.onglets.setStyleSheet("""
             QTabBar {
                 border-top: 10px;
@@ -34,10 +34,10 @@ class UserManagement(QWidget):
             QTabBar::tab {
                 background: #0A1330;
                 margin-top: 10px;
-                width: 110px;
                 padding: 10px;
                 border-color: #0B1739;
                 border-radius: 2px;
+                font-size: 16px;
             }
             QTabBar::tab:hover {
                 background: #081028;

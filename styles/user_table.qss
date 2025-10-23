@@ -1,0 +1,59 @@
+QHeaderView::section {
+    font-size: 17px;
+    background: #0D1B3A;
+    margin-left: 5px;
+}
+
+QTreeView {
+    font-size: 15px;
+    gridline-color: white;
+    color: white;
+}
+
+QTreeView::item {
+    padding: 5;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: white;
+}
+
+QTreeView::item:focus {
+    outline: none;
+    border: 1px solid red;
+}
+
+QTreeView::item:hover {
+    background: rgba(255, 255, 255, 0.05)
+}
+
+QPushButton#btn_edit {
+    background-color: #3498DB;
+    color: white;
+    border-radius: 5px;
+    padding: 4px 8px;
+}
+
+QPushButton#btn_edit:hover {
+    background-color: #2980B9;
+}
+
+QPushButton#btn_delete {
+    background-color: #E74C3C;
+    color: white;
+    border-radius: 5px;
+    padding: 4px 8px;
+}
+
+QPushButton#btn_delete:hover {
+    background-color: #C0392B;
+}
+
+QPushButton#btn_save {
+   background-color: #27AE60;
+   color: white;
+   border-radius: 5px;
+   font-size: 15px;
+}
+
+QPushButton#btn_save:hover {
+    background-color: #1E8449;
+}
