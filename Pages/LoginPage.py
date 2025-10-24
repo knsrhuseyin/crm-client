@@ -8,6 +8,7 @@ from PySide6.QtWidgets import QWidget, QVBoxLayout, QLabel, QLineEdit, QSizePoli
 
 from CRM_API import CrmApiAsync
 from Pages.Panel import AdminPanel
+from utils.utils import load_qss_file
 
 
 class LoginWindow(QWidget):
@@ -37,14 +38,8 @@ class LoginWindow(QWidget):
         card = QFrame()
         card.setFixedWidth(400)
         card.setFixedHeight(600)
-        card.setStyleSheet("""
-            QFrame {
-                background-color: #1b263b;
-                border-radius: 16px;
-                border: 1px solid #23395d;
-                box-shadow: 0px 0px 12px rgba(0, 0, 0, 80);
-            }
-        """)
+        card.setObjectName("card")
+        card.setStyleSheet(load_qss_file("login_page.qss"))
 
         card_layout = QVBoxLayout(card)
         card_layout.setContentsMargins(30, 30, 30, 30)
@@ -66,12 +61,12 @@ class LoginWindow(QWidget):
 
         self.email_input = QLineEdit()
         self.email_input.setPlaceholderText("Adresse e-mail")
-        self.email_input.setStyleSheet(self.input_style())
+        self.email_input.setStyleSheet(load_qss_file("input_style.qss"))
 
         self.password_input = QLineEdit()
         self.password_input.setPlaceholderText("Mot de passe")
         self.password_input.setEchoMode(QLineEdit.EchoMode.Password)
-        self.password_input.setStyleSheet(self.input_style())
+        self.password_input.setStyleSheet(load_qss_file("input_style.qss"))
 
         form_layout.addWidget(self.email_input)
         form_layout.addWidget(self.password_input)
@@ -79,7 +74,7 @@ class LoginWindow(QWidget):
 
         # 🔒 Checkbox afficher le mot de passe
         self.show_password_cb = QCheckBox("Afficher le mot de passe")
-        self.show_password_cb.setStyleSheet("color: #cdd6f4; font-size: 20px;")
+        self.show_password_cb.setStyleSheet("color: #cdd6f4; font-size: 20px; padding: 10;")
         self.show_password_cb.stateChanged.connect(self.toggle_password)
         card_layout.addWidget(self.show_password_cb)
 
@@ -93,7 +88,7 @@ class LoginWindow(QWidget):
         # 🚪 Bouton de connexion
         self.login_btn = QPushButton("Se connecter")
         self.login_btn.setCursor(Qt.CursorShape.PointingHandCursor)
-        self.login_btn.setStyleSheet(self.button_style())
+        self.login_btn.setStyleSheet(load_qss_file("button_style.qss"))
         self.login_btn.clicked.connect(lambda: asyncio.create_task(self.login()))
         card_layout.addWidget(self.login_btn)
 
@@ -110,44 +105,6 @@ class LoginWindow(QWidget):
             self.password_input.setEchoMode(QLineEdit.EchoMode.Normal)
         else:
             self.password_input.setEchoMode(QLineEdit.EchoMode.Password)
-
-    # 🎨 Style des champs de saisie
-    def input_style(self):
-        return """
-            QLineEdit {
-                border: 2px solid #1e3a5f;
-                border-radius: 8px;
-                padding: 15;
-                background-color: #16243d;
-                color: white;
-                margin-bottom: 10px;
-                font-size: 20px;
-            }
-            QLineEdit:focus {
-                border: 2px solid #61dafb;
-                background-color: #1b3350;
-            }
-        """
-
-    # 🎨 Style du bouton
-    def button_style(self):
-        return """
-            QPushButton {
-                background-color: #144272;
-                border: none;
-                border-radius: 10px;
-                color: white;
-                font-weight: bold;
-                padding: 20;
-                font-size: 20px;
-            }
-            QPushButton:hover {
-                background-color: #205295;
-            }
-            QPushButton:pressed {
-                background-color: #2C74B3;
-            }
-        """
 
     def center_on_screen(self):
         screen = QGuiApplication.primaryScreen().availableGeometry()

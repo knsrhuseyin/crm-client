@@ -22,11 +22,7 @@ class ViewUserPage(QWidget):
     def init_ui(self):
         layout = QVBoxLayout()
         title = QLabel("Les utilisateurs", alignment=Qt.AlignmentFlag.AlignCenter)
-        title.setStyleSheet("""
-                    QLabel {
-                        font-size: 24px;
-                    }
-                """)
+        title.setStyleSheet("""font-size: 24px;""")
         layout.addWidget(title)
 
         asyncio.create_task(self.load_users())

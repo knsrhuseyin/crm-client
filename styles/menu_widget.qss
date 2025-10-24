@@ -1,0 +1,20 @@
+QListWidget {
+    margin: 10;
+    border-radius: 2px;
+    font-size: 20px;
+    color: white;
+}
+QListWidget::item {
+    padding: 15;
+}
+QListWidget::item:hover {
+    background: #0A1330;
+    color:white
+}
+QListWidget::item:selected {
+    background: #0A1330;
+    border-left: 2px solid;
+    border-color: #CB3CFF;
+    font-weight: bold;
+    color: white;
+}

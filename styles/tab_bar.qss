@@ -1,0 +1,20 @@
+QTabBar {
+    border-top: 10px;
+}
+
+QTabBar::tab {
+    background: #0A1330;
+    margin-top: 10px;
+    padding: 10px;
+    border-color: #0B1739;
+    border-radius: 2px;
+    font-size: 16px;
+}
+
+QTabBar::tab:hover {
+    background: #081028;
+}
+
+QTabBar::tab:selected {
+    background: #081028;
+}

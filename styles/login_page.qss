@@ -1,0 +1,6 @@
+QFrame#card {
+    background-color: #1b263b;
+    border-radius: 16px;
+    border: 1px solid #23395d;
+    box-shadow: 0px 0px 12px rgba(0, 0, 0, 80);
+}

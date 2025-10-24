@@ -1,7 +1,11 @@
+"""
+Application.py
+==============
+
+Module principale permettant de lancer l'application.
+"""
+
 import asyncio
-import json
-import os.path
-from json import JSONDecodeError
 
 import qasync
 from PySide6.QtCore import Qt, QTimer
@@ -12,7 +16,21 @@ from Pages.LoginPage import LoginWindow
 from Pages.Panel import AdminPanel
 
 class SplashScreen(QWidget):
+    """Splash Screen permettant la connexion automatique de l'utilisateur.
+
+    Hérite de QWidget.
+
+    Attributes:
+        api (CrmApiAsync): La casse de l'API.
+        label (QLabel): La label pour informer du déroulement de la tâche.)
+        progress_bar (QProgressBar): La progressbar pour indiquer le déroulement de la connexion.
+    """
     def __init__(self, api: CrmApiAsync):
+        """Fonction de l'initialisation du splash screen.
+
+        Args:
+            api (CrmApiAsync): La classe de l'API.
+        """
         super().__init__()
         self.api = api
         self.setWindowTitle("Chargement...")
@@ -30,6 +48,10 @@ class SplashScreen(QWidget):
         QTimer.singleShot(0, lambda: asyncio.create_task(self.verify_session()))
 
     async def verify_session(self):
+        """Fonction vérifie et connecte l'utilisateur courant.
+
+        Cette fonction doit être appelée avec await.
+        """
         async def fake_progress():
             for i in range(1, 91):
                 await asyncio.sleep(0.02)
@@ -57,17 +79,26 @@ class SplashScreen(QWidget):
             self.open_login()
 
     def center_on_screen(self):
+        """
+        Fonction permettant de centrer la page sur l'écran
+        """
         screen = QGuiApplication.primaryScreen().availableGeometry()
         x = (screen.width() - self.width()) // 2
         y = (screen.height() - self.height()) // 2
         self.move(x, y)
 
     def open_admin(self):
+        """
+        Fonction permettant d'ouvrir la page de l'administrateur pour la gestion des utilisateurs.
+        """
         self.main = AdminPanel(self.api)
         self.main.show()
         self.close()
 
     def open_login(self):
+        """
+        Fonction permettant d'ouvrir la page de connexion.
+        """
         self.login_page = LoginWindow(self.api)
         self.login_page.show()
         self.close()
@@ -76,6 +107,9 @@ class SplashScreen(QWidget):
 
 
 async def main():
+    """
+    Fonction principale permettant l'ouverture de l'application en ouvrant le Splash Screen.
+    """
     app = QApplication([])
     loop = qasync.QEventLoop(app)
     asyncio.set_event_loop(loop)
@@ -89,4 +123,5 @@ async def main():
 
 
 if __name__ == "__main__":
+    """Lancement du programme"""
     asyncio.run(main())

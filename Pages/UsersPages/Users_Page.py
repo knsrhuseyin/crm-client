@@ -1,17 +1,16 @@
-from PySide6.QtGui import QStandardItemModel
 from PySide6.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QTabWidget
 
 from CRM_API import CrmApiAsync
 from Pages.UsersPages.SubPages.AddUserPage import AddUserPage
 from Pages.UsersPages.SubPages.ViewUsersPage import ViewUserPage
+from utils.utils import load_qss_file
 
 
 class UserManagement(QWidget):
-    def __init__(self, api: CrmApiAsync, admin_panel: QWidget):
+    def __init__(self, api: CrmApiAsync):
         super().__init__()
         self.api = api
         self.users = []
-        self.admin_panel = admin_panel
         self.view_user_page = ViewUserPage(self.api)
 
         container = QWidget()
@@ -25,27 +24,9 @@ class UserManagement(QWidget):
         layout_tab_widget.setContentsMargins(0, 0, 0, 0)
 
         self.onglets = QTabWidget()
+        self.onglets.setStyleSheet(load_qss_file("tab_bar.qss"))
         self.onglets.addTab(self.view_user_page, "UsersPages")
-        self.onglets.addTab(AddUserPage(self.api, self.view_user_page, self.admin_panel), "Ajouter un utilisateur")
-        self.onglets.setStyleSheet("""
-            QTabBar {
-                border-top: 10px;
-            }
-            QTabBar::tab {
-                background: #0A1330;
-                margin-top: 10px;
-                padding: 10px;
-                border-color: #0B1739;
-                border-radius: 2px;
-                font-size: 16px;
-            }
-            QTabBar::tab:hover {
-                background: #081028;
-            }
-            QTabBar::tab:selected {
-                background: #081028;
-            }
-        """)
+        self.onglets.addTab(AddUserPage(self.api, self.view_user_page), "Ajouter un utilisateur")
         layout_tab_widget.addWidget(self.onglets)
         layout_tab_widget.addWidget(container_tab_widget)
         layout_container.addWidget(container_tab_widget)
