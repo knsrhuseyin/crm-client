@@ -8,11 +8,11 @@ Dependencies:
     aiohttp: Pour envoyer des requêtes.
     json: Pour récupérer les données au format JSON
 """
-import aiohttp
 import asyncio
 import json
-
 from typing import Optional, Dict, Any
+
+import aiohttp
 
 
 class Requests:
@@ -22,8 +22,9 @@ class Requests:
         base_url (str): l'URL du serveur contenant l'API
         headers (dict): l'entête envoyé lors des requêtes.
     """
+
     def __init__(self, base_url: str, headers: Optional[Dict[str, str]] = None):
-        """Méthode de l'initialisation de la classe Requests.
+        """Constructeur de la classe Requests.
 
         Args:
             base_url (str): l'URL du serveur contenant l'API
@@ -33,8 +34,11 @@ class Requests:
         self.headers = headers
 
     """Client asynchrone générique pour gérer les requêtes HTTP"""
+
     async def _request(self, method: str, endpoint: str, progress_callback=None, **kwargs) -> Any:
         """Méthode interne qui gère toutes les requêtes HTTP
+
+        Cette fonction doit être appelée avec await.
 
         Args:
             method (str): La méthode HTTP de la requête (GET, POST, ...).
@@ -91,8 +95,11 @@ class Requests:
     # 🌐 Méthodes publiques
     # ------------------------------
 
-    async def get(self, endpoint: str, params: Optional[Dict[str, Any]] = None, headers: dict = None, progress_callback=None) -> Any:
+    async def get(self, endpoint: str, params: Optional[Dict[str, Any]] = None, headers: dict = None,
+                  progress_callback=None) -> Any:
         """Envoie une requête GET
+
+        Cette fonction doit être appelée avec await.
 
         Args:
             endpoint (str) : URL endpoint.
@@ -105,8 +112,11 @@ class Requests:
         """
         return await self._request("GET", endpoint, params=params, headers=headers, progress_callback=progress_callback)
 
-    async def post(self, endpoint: str, json: dict = None, data: Optional[Dict[str, Any]] = None, headers: dict = None, progress_callback=None) -> Any:
+    async def post(self, endpoint: str, json: dict = None, data: Optional[Dict[str, Any]] = None, headers: dict = None,
+                   progress_callback=None) -> Any:
         """Envoie une requête POST
+
+        Cette fonction doit être appelée avec await.
 
         Args:
             endpoint (str) : URL endpoint.
@@ -118,10 +128,14 @@ class Requests:
         Returns:
             Any: La réponse de la requête.
         """
-        return await self._request("POST", endpoint, data=data, json=json, headers=headers, progress_callback=progress_callback)
+        return await self._request("POST", endpoint, data=data, json=json, headers=headers,
+                                   progress_callback=progress_callback)
 
-    async def put(self, endpoint: str, json: Optional[Dict[str, Any]] = None, headers: dict = None, progress_callback=None) -> Any:
+    async def put(self, endpoint: str, json: Optional[Dict[str, Any]] = None, headers: dict = None,
+                  progress_callback=None) -> Any:
         """Envoie une requête PUT
+
+        Cette fonction doit être appelée avec await.
 
         Args:
             endpoint (str) : URL endpoint.
@@ -136,6 +150,8 @@ class Requests:
 
     async def delete(self, endpoint: str, headers: dict = None, progress_callback=None) -> Any:
         """Envoie une requête DELETE
+
+        Cette fonction doit être appelée avec await.
 
         Args:
             endpoint (str) : URL endpoint.

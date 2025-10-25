@@ -13,9 +13,8 @@ from PySide6.QtCore import Qt
 from PySide6.QtWidgets import QWidget, QVBoxLayout, QLabel, QSizePolicy, QStackedWidget, QHBoxLayout, QListWidgetItem, \
     QListWidget
 
-# import interne au programme
+from Pages.UsersPages.UserManagement import UserManagement
 from utils.CrmApiAsync import CrmApiAsync
-from Pages.UsersPages.Users_Page import UserManagement
 from utils.utils import load_qss_file, center_on_screen
 
 
@@ -24,9 +23,10 @@ class MenuWidget(QListWidget):
 
     Hérite de QListWidget
     """
+
     def __init__(self):
         """
-        Méthode d'initialisation du menu de l'admin panel
+        Constructeur du menu de l'admin panel
         """
         super().__init__()
         self.setFixedWidth(300)
@@ -45,8 +45,9 @@ class Panel(QWidget):
         menu (MenuWidget): La classe MenuWidget qu'on a créé ultérieurement.
         stacked_widget (QStackedWidget): La classe qui contient les pages accessible via le panel et nous permet de changer la page.
     """
+
     def __init__(self, stacked_widget: QStackedWidget):
-        """Méthode d'initialisation du panel.
+        """Constructeur du panel.
 
         Args:
             stacked_widget (QStackedWidget): classe qui contient les pages accessible via le panel
@@ -97,8 +98,9 @@ class AdminPanel(QWidget):
     Attributes:
         pages (QStackedWidget): Les pages qui seront accessible via le panel sont ajoutés ici.
     """
+
     def __init__(self, api: CrmApiAsync):
-        """Méthode d'initialisation de la page du Panel.
+        """Constructeur de la page du Panel.
 
         Args:
             api (CrmApiAsync): Classe cliente de l'API.

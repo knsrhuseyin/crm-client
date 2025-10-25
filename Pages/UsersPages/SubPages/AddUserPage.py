@@ -15,18 +15,18 @@ import asyncio
 from PySide6.QtCore import Qt
 from PySide6.QtWidgets import QWidget, QVBoxLayout, QLabel, QSizePolicy, QLineEdit, QPushButton
 
-# import interne au programme
-from utils.CrmApiAsync import CrmApiAsync
 from Pages.UsersPages.SubPages.ViewUsersPage import ViewUserPage
+from utils.CrmApiAsync import CrmApiAsync
 from utils.utils import load_qss_file, add_widgets
 
 
 class AddUserPage(QWidget):
-    """Le design de la pge permettant d'ajouter un utilisateur.
+    """Le design de la page permettant d'ajouter un utilisateur.
 
     Attributes:
-        api (CrmApiAsync): La classe de l'API pour faire des requêtes à la base de donnée.
-        view_user_page (ViewUserPage): La page du tableau des utilisateurs qui va nous servir à émettre un signal apres l'ajout de l'utilisateur afin de mettre à jour le tableau
+        api (CrmApiAsync): La classe de l'API permettant de faire des requêtes à la base de donnée.
+        view_user_page (ViewUserPage): La page du tableau des utilisateurs qui va nous servir à émettre un signal apres
+        l'ajout de l'utilisateur afin de mettre à jour le tableau.
         name (QLineEdit): Le champ pour mettre le nom du nouvel utilisateur.
         first_name (QLineEdit): Le champ pour mettre le prénom du nouvel utilisateur.
         email (QLineEdit): Le champ pour mettre l'email du nouvel utilisateur.
@@ -35,8 +35,9 @@ class AddUserPage(QWidget):
         add_button (QPushButton): Le bouton permettant l'ajout de l'utilisateur.
 
     """
+
     def __init__(self, api: CrmApiAsync, view_user_page: ViewUserPage):
-        """Initialisation de la page
+        """Constructeur de la page AddUserPage.
 
         Args:
             api (CrmApiAsync): la classe de l'API
@@ -101,7 +102,7 @@ class AddUserPage(QWidget):
 
     async def add_user_action(self):
         """
-        Méthode liée au bouton pour permettre l'ajout de l'utilisateur
+        Méthode liée au bouton pour permettre l'ajout de l'utilisateur.
         """
         await self.set_progress("Chargement...", False)
         data = {
@@ -133,7 +134,7 @@ class AddUserPage(QWidget):
             data (dict): Les données de l'utilisateur qu'on veut ajouter.
         """
         response = await self.api.create_user(data["name"], data["first_name"], data["email"], data["telephone"])
-        response_code = await self.api.verify_request(response, "auth.json")
+        response_code = await self.api.verify_request(response)
         if response_code == self.api.Ok:
             self.view_user_page.refresh_users.emit()
             await self.set_progress("L'utilisateur a été ajouté avec succès !")

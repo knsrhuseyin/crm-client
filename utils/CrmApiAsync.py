@@ -9,11 +9,16 @@ Dependencies:
     dotmap: Pour ajouter des attributs dans les dictionnaires
     aiohttp: Pour l'exception rencontrée lors de la requête effectuée grâce àa la class Requests.
 """
+# import module
 import os.path
-
+# import module python
 from typing import Optional, Dict
-from dotmap import DotMap
+
+# import de classe des modules externes
 from aiohttp import ClientResponseError
+from dotmap import DotMap
+
+# import interne au programme
 from utils.Requests import Requests
 from utils.utils import update_json_file, get_data_json, get_key_data_json
 
@@ -38,7 +43,7 @@ class CrmApiAsync(Requests):
     ErrorNotFound: int = 500
 
     def __init__(self, base_url: str, auth_file: str, headers: Optional[Dict[str, str]] = None):
-        """Méthode d'initialisation de la classe CrmApiAsync héritant de Requests.
+        """Constructeur de la classe CrmApiAsync héritant de Requests.
 
         Args:
             base_url (str): L'url de l'API.
@@ -48,7 +53,7 @@ class CrmApiAsync(Requests):
         super().__init__(base_url, headers)
         self.auth_file = auth_file
 
-    async def login(self, email, password, progress_callback=None) -> bool:
+    async def login(self, email, password, progress_callback=None) -> dict:
         """La méthode qui nous permet de nous connecter à l'API.
 
         Cette fonction doit être appelée avec await.
@@ -59,14 +64,13 @@ class CrmApiAsync(Requests):
             progress_callback (Optional[None]]): Paramètre permettant de donner la progression de la requête.
         """
         try:
-            response = await self.post("auth/token", data={"username": email, "password": password}, progress_callback=progress_callback)
-            print(response)
+            response = await self.post("auth/token", data={"username": email, "password": password},
+                                       progress_callback=progress_callback)
             self.headers = {"Authorization": f"Bearer {response["access_token"]}"}
             update_json_file(self.auth_file, "access_token", response["access_token"])
-            return True
+            return response
         except ClientResponseError as e:
-            print(e)
-            return False
+            return {"err": e}
 
     async def create_user(self, name, first_name, email, telephone, progress_callback=None) -> dict:
         """Méthode permettant d'ajouter un utilisateur à la base de donnée.
@@ -148,7 +152,8 @@ class CrmApiAsync(Requests):
             "telephone": modification["telephone"]
         }
         try:
-            return await self.put(f"crm/users/{user_id}", json=new_data, headers=self.headers, progress_callback=progress_callback)
+            return await self.put(f"crm/users/{user_id}", json=new_data, headers=self.headers,
+                                  progress_callback=progress_callback)
         except ClientResponseError as e:
             return {"err": e}
 
@@ -242,6 +247,6 @@ class CrmApiAsync(Requests):
                             os.remove(self.auth_file)
                         return self.AccessTokenError
                 else:
-                        return self.OtherError
+                    return self.OtherError
             else:
                 return self.ErrorNotFound

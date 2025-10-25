@@ -8,11 +8,15 @@ Dependencies:
     pyside6: Module principal du programme
     json: Pour manipuler des fichiers json
 """
+
+# import module
 import json
 import os
+# import module python
 from pathlib import Path
 from typing import List
 
+# import classes pyside6
 from PySide6.QtGui import QGuiApplication
 from PySide6.QtWidgets import QWidget, QBoxLayout
 

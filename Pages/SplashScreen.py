@@ -32,8 +32,9 @@ class SplashScreen(QWidget):
         label (QLabel): Le label qui sert à informer le déroulement de la connexion.
         progress_bar (QProgressBar): La barre de progression pour indiquer le déroulement de la connexion.
     """
+
     def __init__(self, api: CrmApiAsync):
-        """Méthode de l'initialisation du splash screen.
+        """Constructeur de la classe SplashScreen.
 
         Args:
             api (CrmApiAsync): La classe de l'API.
@@ -59,6 +60,7 @@ class SplashScreen(QWidget):
 
         Cette fonction doit être appelée avec await.
         """
+
         async def fake_progress():
             """Fonction mettant en oeuvre une fausse progression.
 
@@ -90,9 +92,9 @@ class SplashScreen(QWidget):
         elif verify_connexion == self.api.ErrorNotFound:
             self.open_login()
 
-    # --------------------------------------------------
-    #   Les fonctions pour changer la page
-    # --------------------------------------------------
+    # ------------------------------------------------------------
+    #   Les fonctions permettant de charger la page concernée
+    # ------------------------------------------------------------
     def open_admin(self):
         """
         Fonction permettant d'ouvrir la page de l'administrateur pour la gestion des utilisateurs.

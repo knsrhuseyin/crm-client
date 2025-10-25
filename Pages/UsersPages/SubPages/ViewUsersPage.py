@@ -1,3 +1,13 @@
+"""
+ViewUserPage.py
+===============
+
+Module de la classe contenant la page ViewUserPage.
+
+Dependencies:
+    pyside6: Module principal du programme.
+"""
+
 import asyncio
 
 from PySide6.QtCore import Qt, Signal
@@ -9,9 +19,22 @@ from utils.utils import load_qss_file
 
 
 class ViewUserPage(QWidget):
+    """Classe contenant la page ViewUserPage.
+
+    Attributes:
+        refresh_users (Signal): Signal permettant de mettre à jour le tableau des utilisateurs.
+        api (CrmApiAsync): Classe contenant les requêtes API client.
+        user_table (QTreeView): Le tableau des utilisateurs.
+        model (QStandardItemModel): Le model du tableau.
+    """
     refresh_users = Signal()
 
     def __init__(self, api: CrmApiAsync):
+        """Constructeur de la classe ViewUserPage.
+
+        Args:
+            api (CrmApiAsync): Classe contenant les requêtes API client.
+        """
         super().__init__()
         self.api = api
         self.user_table = None
@@ -20,6 +43,9 @@ class ViewUserPage(QWidget):
         self.init_ui()
 
     def init_ui(self):
+        """
+        Initialisation de l'interface graphique de la page ViewUserPage.
+        """
         layout = QVBoxLayout()
         title = QLabel("Les utilisateurs", alignment=Qt.AlignmentFlag.AlignCenter)
         title.setStyleSheet("""font-size: 24px;""")
@@ -36,8 +62,10 @@ class ViewUserPage(QWidget):
 
         self.setLayout(layout)
 
-
     async def load_users(self):
+        """
+        Méthode permettant de mettre à jour ou de charger les utilisateurs.
+        """
         users_data = await self.api.get_all_users()
         if "err" in users_data:
             users_data = await self.api.get_all_users()
@@ -82,12 +110,16 @@ class ViewUserPage(QWidget):
 
             self.user_table.setIndexWidget(index, action_widget)
 
-
     # ------------------------------------------------
-    #   Fonction pour supprimer un utilisateur.
+    #   Méthode pour supprimer un utilisateur.
     # ------------------------------------------------
 
-    async def delete_user(self, user_id):
+    async def delete_user(self, user_id: int):
+        """Méthode permettant de supprimer un utilisateur.
+
+        Args:
+            user_id (int): ID de l'utilisateur à supprimer.
+        """
         confirm = QMessageBox.question(
             self,
             "Confirmation",
@@ -105,11 +137,15 @@ class ViewUserPage(QWidget):
                 QMessageBox.information(self, "Succès", f"Utilisateur {user_id} supprimé")
 
     # ------------------------------------------------
-    #   Fonction pour modifier un utilisateur.
+    #   Méthode pour modifier un utilisateur.
     # ------------------------------------------------
 
-    async def update_user(self, user_id):
-        """Passe la ligne de l'utilisateur en mode édition"""
+    async def update_user(self, user_id: int):
+        """Méthode permettant de modifier un utilisateur sur le tableau
+
+        Args:
+            user_id (int): ID de l'utilisateur à modifier.
+        """
         print(f"Modification de l'utilisateur {user_id}")
 
         # Trouver la ligne correspondant à l'utilisateur
@@ -150,7 +186,6 @@ class ViewUserPage(QWidget):
         btn_save.setObjectName("btn_save")
         btn_save.setFocusPolicy(Qt.FocusPolicy.NoFocus)
 
-
         # Au clic → envoyer les nouvelles données à l’API
         async def save_changes():
             new_data = {
@@ -174,9 +209,10 @@ class ViewUserPage(QWidget):
         layout.addWidget(btn_save)
         self.user_table.setIndexWidget(index_action, save_widget)
 
-
-
     def _configure_user_table(self):
+        """
+        Méthode qui configure le tableau des utilisateurs
+        """
         self.user_table.setColumnWidth(3, 225)
         self.user_table.setColumnWidth(4, 150)
         self.user_table.setSelectionMode(self.user_table.SelectionMode.SingleSelection)

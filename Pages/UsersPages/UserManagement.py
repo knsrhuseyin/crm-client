@@ -1,16 +1,40 @@
+"""
+UserManagement.py
+=================
+
+Module qui contient la classe UserManagement gérant la page qui gére les utilisateurs.
+
+Dependencies:
+    pyside6: Dépendance principale de l'application qui permet de créer des interfaces graphiques.
+"""
+
+# import des classes de Pyside6
 from PySide6.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QTabWidget
 
-from utils.CrmApiAsync import CrmApiAsync
 from Pages.UsersPages.SubPages.AddUserPage import AddUserPage
 from Pages.UsersPages.SubPages.ViewUsersPage import ViewUserPage
+from utils.CrmApiAsync import CrmApiAsync
 from utils.utils import load_qss_file
 
 
 class UserManagement(QWidget):
+    """Cette classe est la classe principale de la page gérant les utilisateurs.
+
+    Hérite de QWidget.
+
+    Attributes:
+        api (CrmApiAsync): Classe client de l'API
+        view_user_page (ViewUserPage): Classe de la page qui contient le tableau des utilisateurs.
+    """
+
     def __init__(self, api: CrmApiAsync):
+        """Constructeur de la classe UserManagement.
+
+        Args:
+            api (CrmApiAsync): Classe cliente de l'API.
+        """
         super().__init__()
         self.api = api
-        self.users = []
         self.view_user_page = ViewUserPage(self.api)
 
         container = QWidget()
