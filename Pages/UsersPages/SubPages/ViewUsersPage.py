@@ -141,7 +141,7 @@ class ViewUserPage(QWidget):
     # ------------------------------------------------
 
     async def update_user(self, user_id: int):
-        """Méthode permettant de modifier un utilisateur sur le tableau
+        """Méthode permettant de modifier un utilisateur sur le tableau.
 
         Args:
             user_id (int): ID de l'utilisateur à modifier.
