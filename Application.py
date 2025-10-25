@@ -8,6 +8,7 @@ Dependencies:
     pyside6: Dépendance principale de l'application qui permet de créer des interfaces graphiques.
     qasync: Dépendance permettant de rendre les interfaces graphiques asynchrones.
 """
+
 # import de module.
 import asyncio
 import qasync
