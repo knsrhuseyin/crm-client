@@ -27,7 +27,7 @@ async def main():
     app = QApplication([])
     loop = qasync.QEventLoop(app)
     asyncio.set_event_loop(loop)
-    api = CrmApiAsync("https://api-crm.knsr-family.com", "auth.json")
+    api = CrmApiAsync(URL, "auth.json")
 
     splash = SplashScreen(api)
     splash.show()
