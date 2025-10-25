@@ -3,15 +3,20 @@ Panel.py
 ========
 
 Ce module contient la géstion et le design du panel administrateur.
+
+Dependencies:
+    pyside6: Module principal du programme.
 """
+
+# import des classes de pyside6
 from PySide6.QtCore import Qt
-from PySide6.QtGui import QGuiApplication
 from PySide6.QtWidgets import QWidget, QVBoxLayout, QLabel, QSizePolicy, QStackedWidget, QHBoxLayout, QListWidgetItem, \
     QListWidget
 
-from CRM_API import CrmApiAsync
+# import interne au programme
+from utils.CrmApiAsync import CrmApiAsync
 from Pages.UsersPages.Users_Page import UserManagement
-from utils.utils import load_qss_file
+from utils.utils import load_qss_file, center_on_screen
 
 
 class MenuWidget(QListWidget):
@@ -21,7 +26,7 @@ class MenuWidget(QListWidget):
     """
     def __init__(self):
         """
-        Fonction d'initialisation du menu de l'admin panel
+        Méthode d'initialisation du menu de l'admin panel
         """
         super().__init__()
         self.setFixedWidth(300)
@@ -34,14 +39,14 @@ class MenuWidget(QListWidget):
 class Panel(QWidget):
     """Classe gérant le changement de page du Panel.
 
-    Hérite de QWidget
+    Hérite de QWidget.
 
     Attributes:
         menu (MenuWidget): La classe MenuWidget qu'on a créé ultérieurement.
         stacked_widget (QStackedWidget): La classe qui contient les pages accessible via le panel et nous permet de changer la page.
     """
     def __init__(self, stacked_widget: QStackedWidget):
-        """Fonction de l'initialisation du panel
+        """Méthode d'initialisation du panel.
 
         Args:
             stacked_widget (QStackedWidget): classe qui contient les pages accessible via le panel
@@ -76,7 +81,7 @@ class Panel(QWidget):
         self.setLayout(layout)
 
     def change_page(self, index: int):
-        """Fonction permettant de changer la page affichée dans le QStackedWidget.
+        """Méthode permettant de changer la page affichée dans le QStackedWidget.
 
         Args:
             index (int): Chiffre permettant d'indiquer la page à afficher.
@@ -85,22 +90,22 @@ class Panel(QWidget):
 
 
 class AdminPanel(QWidget):
-    """Classe de la page du Panel
+    """Classe de la page du Panel.
 
     Hérite de QWidget.
 
     Attributes:
-        pages (QStackedWidget): Les pages accessible via le panel qui sont ajoutés ici.
+        pages (QStackedWidget): Les pages qui seront accessible via le panel sont ajoutés ici.
     """
     def __init__(self, api: CrmApiAsync):
-        """Fonction d'initialisation de la page du Panel.
+        """Méthode d'initialisation de la page du Panel.
 
         Args:
-            api (CrmApiAsync): Classe de l'API.
+            api (CrmApiAsync): Classe cliente de l'API.
         """
         super().__init__()
         self.resize(1280, 720)
-        self.center_on_screen()
+        center_on_screen(self)
 
         self.pages = QStackedWidget()
         self.pages.addWidget(UserManagement(api))
@@ -113,12 +118,3 @@ class AdminPanel(QWidget):
         layout.setSpacing(0)
 
         self.setLayout(layout)
-
-    def center_on_screen(self):
-        """
-        Fonction permettant de centrer la fenêtre sur l'écran.
-        """
-        screen = QGuiApplication.primaryScreen().availableGeometry()
-        x = (screen.width() - self.width()) // 2
-        y = (screen.height() - self.height()) // 2
-        self.move(x, y)

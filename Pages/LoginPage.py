@@ -1,14 +1,13 @@
 import asyncio
-import json
 
 from PySide6.QtCore import Qt
 from PySide6.QtGui import QPalette, QColor, QFont, QGuiApplication
 from PySide6.QtWidgets import QWidget, QVBoxLayout, QLabel, QLineEdit, QSizePolicy, QPushButton, QFormLayout, QCheckBox, \
     QSpacerItem, QFrame
 
-from CRM_API import CrmApiAsync
+from utils.CrmApiAsync import CrmApiAsync
 from Pages.Panel import AdminPanel
-from utils.utils import load_qss_file
+from utils.utils import load_qss_file, update_json_file, center_on_screen
 
 
 class LoginWindow(QWidget):
@@ -20,7 +19,7 @@ class LoginWindow(QWidget):
     def init_ui(self):
         self.setWindowTitle("Connexion")
         self.resize(1280, 720)
-        self.center_on_screen()
+        center_on_screen(self)
 
         # 🌌 Thème général bleu sombre
         palette = QPalette()
@@ -106,24 +105,14 @@ class LoginWindow(QWidget):
         else:
             self.password_input.setEchoMode(QLineEdit.EchoMode.Password)
 
-    def center_on_screen(self):
-        screen = QGuiApplication.primaryScreen().availableGeometry()
-        x = (screen.width() - self.width()) // 2
-        y = (screen.height() - self.height()) // 2
-        self.move(x, y)
-
     async def login(self):
-        username = self.email_input.text()
+        email = self.email_input.text()
         password = self.password_input.text()
-        print(username, password)
-        if await self.api.login(username, password):
+        print(email, password)
+        if await self.api.login(email, password):
             if self.remember_cb.isChecked():
-                login_data = {
-                    "username": username,
-                    "password": password
-                }
-                with open("auth.json", "w") as f:
-                    json.dump(login_data, f)
+                update_json_file("auth.json", "email", email)
+                update_json_file("auth.json", "password", password)
             self.admin_panel = AdminPanel(self.api)
             self.admin_panel.show()
             self.close()

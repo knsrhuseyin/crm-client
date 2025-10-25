@@ -3,13 +3,20 @@ AddUserPage.py
 ==============
 
 Ce module est le design de la page qui nous permet d'ajouter l'utilisateur.
+
+Dependencies:
+    pyside6: Dépendance principale afin de créer l'interface graphique ici pour créer la page AddUserPage.
 """
+
+# import de module
 import asyncio
 
+# import des classes de Pyside6
 from PySide6.QtCore import Qt
-from PySide6.QtWidgets import QWidget, QVBoxLayout, QLabel, QSizePolicy, QLineEdit, QPushButton, QProgressBar
+from PySide6.QtWidgets import QWidget, QVBoxLayout, QLabel, QSizePolicy, QLineEdit, QPushButton
 
-from CRM_API import CrmApiAsync
+# import interne au programme
+from utils.CrmApiAsync import CrmApiAsync
 from Pages.UsersPages.SubPages.ViewUsersPage import ViewUserPage
 from utils.utils import load_qss_file, add_widgets
 
@@ -79,11 +86,11 @@ class AddUserPage(QWidget):
         self.setLayout(layout)
 
     # ------------------------------------------------------------
-    #   Fonctions pour l'ajout de l'utilisateur
+    #   Méthodes pour l'ajout de l'utilisateur
     # ------------------------------------------------------------
 
     async def set_progress(self, text: str, button_enabled: bool = True):
-        """Mets à jour la progression de l'ajout de l'utilisateur.
+        """Méthode permettant de mettre à jour la progression de l'ajout de l'utilisateur.
 
         Args:
             text (str): Le texte qui sera indiqué au label.
@@ -94,7 +101,7 @@ class AddUserPage(QWidget):
 
     async def add_user_action(self):
         """
-        Fonction liée au bouton pour permettre l'ajout de l'utilisateur
+        Méthode liée au bouton pour permettre l'ajout de l'utilisateur
         """
         await self.set_progress("Chargement...", False)
         data = {
@@ -120,7 +127,7 @@ class AddUserPage(QWidget):
         self.add_button.setEnabled(True)
 
     async def add_user_to_database(self, data: dict):
-        """Fonction permettant l'ajout de l'utilisateur dans la base de donnée externe via une requête à l'API.
+        """Méthode permettant l'ajout de l'utilisateur dans la base de donnée externe via une requête à l'API.
 
         Args:
             data (dict): Les données de l'utilisateur qu'on veut ajouter.

@@ -1,10 +1,10 @@
 import asyncio
 
 from PySide6.QtCore import Qt, Signal
-from PySide6.QtGui import QStandardItem, QGuiApplication, QStandardItemModel
+from PySide6.QtGui import QStandardItem, QStandardItemModel
 from PySide6.QtWidgets import QWidget, QVBoxLayout, QLabel, QTreeView, QPushButton, QMessageBox, QHBoxLayout, QLineEdit
 
-from CRM_API import CrmApiAsync
+from utils.CrmApiAsync import CrmApiAsync
 from utils.utils import load_qss_file
 
 

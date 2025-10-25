@@ -1,6 +1,6 @@
 from PySide6.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QTabWidget
 
-from CRM_API import CrmApiAsync
+from utils.CrmApiAsync import CrmApiAsync
 from Pages.UsersPages.SubPages.AddUserPage import AddUserPage
 from Pages.UsersPages.SubPages.ViewUsersPage import ViewUserPage
 from utils.utils import load_qss_file
