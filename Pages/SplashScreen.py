@@ -82,11 +82,13 @@ class SplashScreen(QWidget):
 
         # Vérification de la requête.
         if verify_connexion == self.api.Ok:
+            print(connexion)
             self.open_admin()
         elif verify_connexion == self.api.UserReconnected:
             await self.verify_session()
         elif verify_connexion == self.api.AccessTokenError:
             self.open_login()
+            # self.open_admin()
         elif verify_connexion == self.api.OtherError:
             self.open_login()
         elif verify_connexion == self.api.ErrorNotFound:
@@ -99,7 +101,7 @@ class SplashScreen(QWidget):
         """
         Fonction permettant d'ouvrir la page de l'administrateur pour la gestion des utilisateurs.
         """
-        self.main = AdminPanel(self.api)
+        self.main = AdminPanel(self.api, LoginWindow(self.api))
         self.main.show()
         self.close()
 

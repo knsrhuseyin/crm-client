@@ -148,6 +148,8 @@ class AddUserPage(QWidget):
                 print(response["err"].message)
                 await self.set_progress("L'utilisateur existe déjà !")
                 return
+            elif response["err"].message == "Not authenticated":
+                await self.set_progress("Vous n'êtes pas connecté !")
             else:
                 print(response["err"].message)
                 await self.set_progress("Un problème est survenu !")

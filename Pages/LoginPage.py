@@ -189,7 +189,7 @@ class LoginWindow(QWidget):
             if self.remember_cb.isChecked():
                 update_json_file("auth.json", "email", email)
                 update_json_file("auth.json", "password", password)
-            self.admin_panel = AdminPanel(self.api)
+            self.admin_panel = AdminPanel(self.api, LoginWindow(self.api))
             self.admin_panel.show()
             self.close()
         elif connexion_code == self.api.OtherError:

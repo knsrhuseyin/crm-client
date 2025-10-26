@@ -13,6 +13,7 @@ from PySide6.QtCore import Qt
 from PySide6.QtWidgets import QWidget, QVBoxLayout, QLabel, QSizePolicy, QStackedWidget, QHBoxLayout, QListWidgetItem, \
     QListWidget
 
+from Pages.AccountPage.AccountPage import AccountPage
 from Pages.UsersPages.UserManagement import UserManagement
 from utils.CrmApiAsync import CrmApiAsync
 from utils.utils import load_qss_file, center_on_screen
@@ -30,7 +31,8 @@ class MenuWidget(QListWidget):
         """
         super().__init__()
         self.setFixedWidth(300)
-        self.addItem(QListWidgetItem("Dashboard"))
+        self.addItem(QListWidgetItem("Gestion des utilisateurs"))
+        self.addItem(QListWidgetItem("Mon compte"))
         self.setCurrentRow(0)
         self.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.setStyleSheet(load_qss_file("menu_widget.qss"))
@@ -63,10 +65,16 @@ class Panel(QWidget):
 
         layout = QVBoxLayout()
         layout_container = QVBoxLayout(container)
+
         title = QLabel("Admin Panel", alignment=Qt.AlignmentFlag.AlignCenter)
         title.setStyleSheet("""padding: 10; font-size: 20px; margin:10; font-weight: bold;""")
+
+        creator = QLabel("Created by knsrhuseyin", alignment=Qt.AlignmentFlag.AlignCenter)
+        creator.setStyleSheet("""padding: 5; font-size: 15px; margin-bottom:5; color: gray;""")
+
         layout_container.addWidget(title)
         layout_container.addWidget(self.menu)
+        layout_container.addWidget(creator)
 
         layout_container.setContentsMargins(0, 0, 0, 0)
         layout_container.setSpacing(0)
@@ -99,7 +107,7 @@ class AdminPanel(QWidget):
         pages (QStackedWidget): Les pages qui seront accessible via le panel sont ajoutés ici.
     """
 
-    def __init__(self, api: CrmApiAsync):
+    def __init__(self, api: CrmApiAsync, login_window):
         """Constructeur de la page du Panel.
 
         Args:
@@ -111,6 +119,7 @@ class AdminPanel(QWidget):
 
         self.pages = QStackedWidget()
         self.pages.addWidget(UserManagement(api))
+        self.pages.addWidget(AccountPage(api, self, login_window))
 
         layout = QHBoxLayout()
         layout.addWidget(Panel(self.pages))
