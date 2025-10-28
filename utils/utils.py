@@ -7,6 +7,7 @@ Ce module ajoute des fonctions utilitaires pour mieux gérer le style ou facilit
 Dependencies:
     pyside6: Module principal du programme
     json: Pour manipuler des fichiers json
+    passlib: Pour crypter et décrypter les mot de passes.
 """
 
 # import module
@@ -133,22 +134,35 @@ def create_message_box(parent: QWidget, title: str, text: str, question: bool = 
 
 
 def configure_line_edit(name_edit: QLineEdit, first_name_edit: QLineEdit, telephone_edit: QLineEdit, email_edit: QLineEdit):
-        validator_num = QRegularExpressionValidator(QRegularExpression(r"[0-9]{0,10}"))
-        validator_text = QRegularExpressionValidator(QRegularExpression(r"^[A-Za-zÀ-ÿ\s-]*$"))
-        validator_mail = QRegularExpressionValidator(QRegularExpression(r"^[A-Za-z0-9._@-]*$"))
+    """Fonction qui permet de configurer les droits de saisis des champs
 
-        for edit in [name_edit, first_name_edit, telephone_edit, email_edit]:
-            if edit == telephone_edit:
-                edit.setMaxLength(10)
-                edit.setValidator(validator_num)
-            elif edit == email_edit:
-                edit.setValidator(validator_mail)
-                edit.setMaxLength(50)
-            else:
-                edit.setMaxLength(100)
-                edit.setValidator(validator_text)
+    Args:
+        name_edit (QLineEdit): Champ du nom.
+        first_name_edit (QLineEdit): Champ du prénom.
+        telephone_edit (QLineEdit): Champ du telephone.
+        email_edit (QLineEdit): Champ du email.
+    """
+    validator_num = QRegularExpressionValidator(QRegularExpression(r"[0-9]{0,10}"))
+    validator_text = QRegularExpressionValidator(QRegularExpression(r"^[A-Za-zÀ-ÿ\s-]*$"))
+    validator_mail = QRegularExpressionValidator(QRegularExpression(r"^[A-Za-z0-9._@-]*$"))
+
+    for edit in [name_edit, first_name_edit, telephone_edit, email_edit]:
+        if edit == telephone_edit:
+            edit.setMaxLength(10)
+            edit.setValidator(validator_num)
+        elif edit == email_edit:
+            edit.setValidator(validator_mail)
+            edit.setMaxLength(50)
+        else:
+            edit.setMaxLength(100)
+            edit.setValidator(validator_text)
 
 
 def get_icon(file_name: str) -> QIcon:
+    """Fonction qui permet de retourner une icon  notamment pour mettre des icons dans les boutons.
+
+    Args:
+        file_name (str): Nom du fichier.
+    """
     image_path = Path(__file__).parent.parent / "assets" / Path(file_name)
     return QIcon(str(image_path))

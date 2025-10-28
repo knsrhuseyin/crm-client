@@ -6,6 +6,7 @@ Module qui contient la classe de la page de connexion.
 
 Dependencies:
     pyside6: Dépendance principale de l'application qui permet de créer des interfaces graphiques.
+    passlib: Pour crypter le mot de passe à sauvegarder.
 """
 
 # import de module
@@ -123,7 +124,7 @@ class LoginWindow(QWidget):
         card_layout.addWidget(self.show_password_cb)
 
         # Checkbox se souvenir du mot de passe
-        self.remember_cb = QCheckBox("Se souvenir du mot de passe")
+        self.remember_cb = QCheckBox("Se souvenir de moi")
         self.remember_cb.setStyleSheet("color: #cdd6f4; font-size: 20px; padding: 5; margin-bottom: 30px;")
         card_layout.addWidget(self.remember_cb)
 
@@ -187,8 +188,7 @@ class LoginWindow(QWidget):
         if connexion_code == self.api.Ok:
             self.info_label.setText("Connexion réussi !")
             if self.remember_cb.isChecked():
-                update_json_file("auth.json", "email", email)
-                update_json_file("auth.json", "password", password)
+                update_json_file("auth.json", "access_token", connexion["access_token"])
             self.admin_panel = AdminPanel(self.api, LoginWindow(self.api))
             self.admin_panel.show()
             self.close()

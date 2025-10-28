@@ -20,7 +20,7 @@ from dotmap import DotMap
 
 # import interne au programme
 from utils.Requests import Requests
-from utils.utils import update_json_file, get_data_json, get_key_data_json
+from utils.utils import get_key_data_json
 
 
 class CrmApiAsync(Requests):
@@ -37,7 +37,6 @@ class CrmApiAsync(Requests):
         auth_file (str): Attribut stockant la destination du fichier stockant les informations d'authentifications.
     """
     Ok: int = 200
-    UserReconnected: int = 300
     AccessTokenError: int = 400
     OtherError: int = 450
     ErrorNotFound: int = 500
@@ -67,7 +66,6 @@ class CrmApiAsync(Requests):
             response = await self.post("auth/token", data={"username": email, "password": password},
                                        progress_callback=progress_callback)
             self.headers = {"Authorization": f"Bearer {response["access_token"]}"}
-            update_json_file(self.auth_file, "access_token", response["access_token"])
             return response
         except ClientResponseError as e:
             return {"err": e}
@@ -234,19 +232,7 @@ class CrmApiAsync(Requests):
         else:
             if hasattr(response["err"], "message"):
                 if response["err"].message == "Could not verify creditials":
-                    auth_file = get_data_json(self.auth_file)
-                    if auth_file is not None and "email" in auth_file and "password" in auth_file:
-                        connexion = await self.login(auth_file["email"], auth_file["password"])
-                        connexion_code = await self.verify_request(connexion)
-                        if connexion_code == self.Ok:
-                            return self.UserReconnected
-                        else:
-                            os.remove(self.auth_file)
-                            return self.AccessTokenError
-                    else:
-                        if os.path.exists(self.auth_file):
-                            os.remove(self.auth_file)
-                        return self.AccessTokenError
+                    return self.AccessTokenError
                 else:
                     return self.OtherError
             else:

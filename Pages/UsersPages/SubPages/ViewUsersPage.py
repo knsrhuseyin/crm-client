@@ -89,8 +89,6 @@ class ViewUserPage(QWidget):
 
         if requests_code == self.api.Ok:
             self._add_users(requests_users_data)
-        elif requests_code == self.api.UserReconnected:
-            self._add_users(requests_users_data)
         elif requests_code == self.api.AccessTokenError:
             QMessageBox.critical(self, "Erreur", f"Votre connexion a expiré ! Veuillez vous reconnecter !")
             self.info_label.setText("Votre connexion a expiré ! Veuillez vous reconnecter !")
@@ -170,8 +168,6 @@ class ViewUserPage(QWidget):
         if result_code == self.api.Ok:
             await self.load_users()
             create_message_box(self, "Succès", f"Utilisateur {user_id} supprimé")
-        elif result_code == self.api.UserReconnected:
-            await self.delete_user_in_bdd(user_id)
         elif result_code == self.api.AccessTokenError:
             create_message_box(self, "Erreur", "Votre connexion a expiré ! Veuillez vous reconnecter !", False, True)
         elif result_code == self.api.OtherError:
@@ -251,8 +247,6 @@ class ViewUserPage(QWidget):
             if result_code == self.api.Ok:
                 await self.load_users()
                 print("Modification réussi !")
-            elif result_code == self.api.UserReconnected:
-                await save_changes()
             elif result_code == self.api.AccessTokenError:
                 create_message_box(self, "Erreur", "Votre connexion a expiré ! Veuillez vous reconnecter !", False,
                                    True)

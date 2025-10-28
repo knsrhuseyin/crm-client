@@ -98,8 +98,6 @@ class SplashScreen(QWidget):
         # Vérification de la requête.
         if verify_connexion == self.api.Ok:
             self.open_admin()
-        elif verify_connexion == self.api.UserReconnected:
-            await self.verify_session()
         elif verify_connexion == self.api.AccessTokenError:
             self.open_login()
         elif verify_connexion == self.api.OtherError:

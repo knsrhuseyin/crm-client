@@ -1,5 +1,4 @@
 auth.json
-token.json
 .venv/
 .idea/
 __pycache__/

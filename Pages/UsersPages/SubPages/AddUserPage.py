@@ -156,8 +156,6 @@ class AddUserPage(QWidget):
         if response_code == self.api.Ok:
             self.view_user_page.refresh_users.emit()
             await self.set_progress("L'utilisateur a été ajouté avec succès !")
-        elif response_code == self.api.UserReconnected:
-            await self.add_user_to_database(data)
         elif response_code == self.api.AccessTokenError:
             await self.set_progress("Votre connexion a expiré ! Veuillez vous reconnecter !")
             return
