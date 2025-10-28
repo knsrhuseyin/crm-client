@@ -36,7 +36,12 @@ class UserManagement(QWidget):
         super().__init__()
         self.api = api
         self.view_user_page = ViewUserPage(self.api)
+        self.init_ui()
 
+    def init_ui(self):
+        """
+        Constructeur de l'interface graphique de la page UserManagement.
+        """
         container = QWidget()
 
         layout = QVBoxLayout()

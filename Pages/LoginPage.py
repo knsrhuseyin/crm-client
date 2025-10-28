@@ -54,7 +54,7 @@ class LoginWindow(QWidget):
 
     def init_ui(self):
         """
-        Méthode d'initialisation de l'interface graphique de la page de connexion
+        Constructeur de l'interface graphique de la page de connexion
         """
         self.setWindowTitle("Connexion")
         self.resize(1280, 720)
@@ -130,6 +130,7 @@ class LoginWindow(QWidget):
         # Bouton de connexion
         self.login_btn = QPushButton("Se connecter")
         self.login_btn.setCursor(Qt.CursorShape.PointingHandCursor)
+        self.login_btn.setObjectName("login_btn")
         self.login_btn.setStyleSheet(load_qss_file("button_style.qss"))
         self.login_btn.clicked.connect(lambda: asyncio.create_task(self.login()))
         card_layout.addWidget(self.login_btn)
@@ -181,7 +182,6 @@ class LoginWindow(QWidget):
             return
 
         connexion = await self.api.login(email, password)
-        self.set_progress("Chargement...", False)
         connexion_code = await self.api.verify_request(connexion)
 
         if connexion_code == self.api.Ok:

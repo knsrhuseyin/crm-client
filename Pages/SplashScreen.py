@@ -29,6 +29,8 @@ class SplashScreen(QWidget):
 
     Attributes:
         api (CrmApiAsync): La classe cliente de l'API.
+        login_page (LoginPage): La page de connexion si l'utilisateur n'est pas connecté.
+        admin_panel (AdminPanel): La page administrateur si l'utilisateur est connecté.
         label (QLabel): Le label qui sert à informer le déroulement de la connexion.
         progress_bar (QProgressBar): La barre de progression pour indiquer le déroulement de la connexion.
     """
@@ -41,13 +43,26 @@ class SplashScreen(QWidget):
         """
         super().__init__()
         self.api = api
+        self.login_page = None
+        self.admin_panel = None
+        self.label = None
+        self.progress_bar = None
+        self.init_ui()
+
+    def init_ui(self):
+        """
+        Constructeur de l'interface graphique de la page SplashScreen.
+        """
         self.setWindowTitle("Chargement...")
         self.resize(300, 150)
-        center_on_screen(self)
         self.setWindowFlags(Qt.WindowType.FramelessWindowHint | Qt.WindowType.WindowStaysOnTopHint)
         self.setStyleSheet("background-color: #222; color: white;")
+
+        center_on_screen(self)
+
         self.label = QLabel("🔄 Vérification de la session...", alignment=Qt.AlignmentFlag.AlignCenter)
         self.progress_bar = QProgressBar()
+
         layout = QVBoxLayout(self)
         layout.addWidget(self.label)
         layout.addWidget(self.progress_bar)
@@ -82,13 +97,11 @@ class SplashScreen(QWidget):
 
         # Vérification de la requête.
         if verify_connexion == self.api.Ok:
-            print(connexion)
             self.open_admin()
         elif verify_connexion == self.api.UserReconnected:
             await self.verify_session()
         elif verify_connexion == self.api.AccessTokenError:
             self.open_login()
-            # self.open_admin()
         elif verify_connexion == self.api.OtherError:
             self.open_login()
         elif verify_connexion == self.api.ErrorNotFound:
@@ -99,15 +112,15 @@ class SplashScreen(QWidget):
     # ------------------------------------------------------------
     def open_admin(self):
         """
-        Fonction permettant d'ouvrir la page de l'administrateur pour la gestion des utilisateurs.
+        Méthode permettant d'ouvrir la page de l'administrateur pour la gestion des utilisateurs.
         """
-        self.main = AdminPanel(self.api, LoginWindow(self.api))
-        self.main.show()
+        self.admin_panel = AdminPanel(self.api, LoginWindow(self.api))
+        self.admin_panel.show()
         self.close()
 
     def open_login(self):
         """
-        Fonction permettant d'ouvrir la page de connexion.
+        Méthode permettant d'ouvrir la page de connexion.
         """
         self.login_page = LoginWindow(self.api)
         self.login_page.show()

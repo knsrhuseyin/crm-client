@@ -12,7 +12,8 @@ Dependencies:
 import asyncio
 
 # import des classes de Pyside6
-from PySide6.QtCore import Qt
+from PySide6.QtCore import Qt, QRegularExpression
+from PySide6.QtGui import QRegularExpressionValidator
 from PySide6.QtWidgets import QWidget, QVBoxLayout, QLabel, QSizePolicy, QLineEdit, QPushButton
 
 from Pages.UsersPages.SubPages.ViewUsersPage import ViewUserPage
@@ -65,6 +66,21 @@ class AddUserPage(QWidget):
         self.first_name.setPlaceholderText("Prenom")
         self.email.setPlaceholderText("Email")
         self.telephone.setPlaceholderText("Telephone")
+
+        validator_num = QRegularExpressionValidator(QRegularExpression(r"[0-9]{0,10}"))
+        validator_text = QRegularExpressionValidator(QRegularExpression(r"^[A-Za-zÀ-ÿ\s-]*$"))
+        validator_mail = QRegularExpressionValidator(QRegularExpression(r"^[A-Za-z0-9._@-]*$"))
+
+        for edit in [self.name, self.first_name, self.email, self.telephone]:
+            if edit == self.telephone:
+                edit.setMaxLength(10)
+                edit.setValidator(validator_num)
+            elif edit == self.email:
+                edit.setValidator(validator_mail)
+                edit.setMaxLength(50)
+            else:
+                edit.setMaxLength(100)
+                edit.setValidator(validator_text)
 
         self.info_label = QLabel()
         self.info_label.setStyleSheet("""font-size: 20px;""")
@@ -135,6 +151,8 @@ class AddUserPage(QWidget):
         """
         response = await self.api.create_user(data["name"], data["first_name"], data["email"], data["telephone"])
         response_code = await self.api.verify_request(response)
+
+        # Vérification de la requête.
         if response_code == self.api.Ok:
             self.view_user_page.refresh_users.emit()
             await self.set_progress("L'utilisateur a été ajouté avec succès !")

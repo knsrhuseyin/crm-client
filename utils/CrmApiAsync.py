@@ -207,7 +207,6 @@ class CrmApiAsync(Requests):
             try:
                 return await self.get("crm", headers=self.headers, progress_callback=progress_callback)
             except ClientResponseError as e:
-                print(e)
                 return {"err": e}
         else:
             token = get_key_data_json(self.auth_file, "access_token")
@@ -237,7 +236,9 @@ class CrmApiAsync(Requests):
                 if response["err"].message == "Could not verify creditials":
                     auth_file = get_data_json(self.auth_file)
                     if auth_file is not None and "email" in auth_file and "password" in auth_file:
-                        if await self.login(auth_file["email"], auth_file["password"]):
+                        connexion = await self.login(auth_file["email"], auth_file["password"])
+                        connexion_code = await self.verify_request(connexion)
+                        if connexion_code == self.Ok:
                             return self.UserReconnected
                         else:
                             os.remove(self.auth_file)

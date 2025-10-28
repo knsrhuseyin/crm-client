@@ -10,12 +10,12 @@ Dependencies:
 
 import asyncio
 
-from PySide6.QtCore import Qt, Signal
-from PySide6.QtGui import QStandardItem, QStandardItemModel
+from PySide6.QtCore import Qt, Signal, QSize
+from PySide6.QtGui import QStandardItem, QStandardItemModel, QIcon
 from PySide6.QtWidgets import QWidget, QVBoxLayout, QLabel, QTreeView, QPushButton, QMessageBox, QHBoxLayout, QLineEdit
 
 from utils.CrmApiAsync import CrmApiAsync
-from utils.utils import load_qss_file
+from utils.utils import load_qss_file, create_message_box, configure_line_edit, get_icon
 
 
 class ViewUserPage(QWidget):
@@ -48,12 +48,20 @@ class ViewUserPage(QWidget):
 
     def init_ui(self):
         """
-        Initialisation de l'interface graphique de la page ViewUserPage.
+        Constructeur de l'interface graphique de la page ViewUserPage.
         """
         layout = QVBoxLayout()
+        title_container = QWidget()
+        title_layout = QHBoxLayout(title_container)
+
         title = QLabel("Les utilisateurs", alignment=Qt.AlignmentFlag.AlignCenter)
         title.setStyleSheet("""font-size: 24px; padding: 20;""")
-        layout.addWidget(title)
+
+        title_layout.addWidget(title)
+        title_layout.addStretch()
+        add_button_to_layout("", "", title_layout, self.load_users, 0, get_icon("actualise.png"))
+
+        layout.addWidget(title_container)
 
         self.user_table = QTreeView()
         self.model = QStandardItemModel()
@@ -92,17 +100,15 @@ class ViewUserPage(QWidget):
         elif requests_code == self.api.ErrorNotFound:
             self.info_label.setText("Un problème est survenu, veuillez contacté l'administrateur de ce programme !")
 
-    def _add_button_to_table(self, name: str, object_name: str, layout: QHBoxLayout, user_id: int, action):
-        btn = QPushButton(name)
-        btn.setObjectName(object_name)
-        btn.setFocusPolicy(Qt.FocusPolicy.NoFocus)
-        btn.clicked.connect(lambda _, uid=user_id: asyncio.create_task(action(uid)))
-        layout.addWidget(btn)
-
     def _add_user_to_table(self, user: dict):
-        print(user, "L.80, ViewUserPage.py")
+        """Méthode permettant d'ajouter un utilisateur dans le tableau.
+
+        Args:
+            user (dict): L'utilisateur à ajouter.
+        """
         if user == "err":
             self.info_label.setText("Une erreur est survenue, veuillez relancer l'application !")
+            return
         users = [
             QStandardItem(str(user["id"])),
             QStandardItem(user["name"]),
@@ -121,12 +127,17 @@ class ViewUserPage(QWidget):
         layout.setContentsMargins(0, 0, 0, 0)
         layout.setSpacing(5)
 
-        self._add_button_to_table("✏️ Modifier", "btn_edit", layout, user["id"], self.update_user)
-        self._add_button_to_table("🗑 Supprimer", "btn_delete", layout, user["id"], self.delete_user)
+        add_button_to_layout("✏️ Modifier", "btn_edit", layout, self.update_user, user["id"])
+        add_button_to_layout("🗑 Supprimer", "btn_delete", layout, self.delete_user, user["id"])
 
         self.user_table.setIndexWidget(index, action_widget)
 
     def _add_users(self, users: dict):
+        """Méthode permettant d'ajouter une liste d'utilisateur dans le tableau.
+
+        Args:
+            users (dict): Le dictionnaire des utilisateurs.
+        """
         for user in users:
             self._add_user_to_table(user)
 
@@ -135,27 +146,41 @@ class ViewUserPage(QWidget):
     # ------------------------------------------------
 
     async def delete_user(self, user_id: int):
-        """Méthode permettant de supprimer un utilisateur.
+        """Méthode permettant de confirmer la suppression de l'utilisateur.
 
         Args:
             user_id (int): ID de l'utilisateur à supprimer.
         """
-        confirm = QMessageBox.question(
-            self,
-            "Confirmation",
-            f"Voulez-vous vraiment supprimer l’utilisateur {user_id} ?",
-            QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
-        )
+        confirm = create_message_box(self, "Confirmation",
+                                     f"Voulez-vous vraiment supprimer l’utilisateur {user_id} ?",
+                                     True)
 
-        if confirm == QMessageBox.StandardButton.Yes:
-            result = await self.api.delete_user(user_id)
-            print("delete !")
-            if "err" in result:
-                await self.load_users()
-                # QMessageBox.critical(self, "Erreur", f"Impossible de supprimer l’utilisateur {user_id}")
-            else:
-                await self.load_users()
-                QMessageBox.information(self, "Succès", f"Utilisateur {user_id} supprimé")
+        if confirm:
+            await self.delete_user_in_bdd(user_id)
+
+    async def delete_user_in_bdd(self, user_id: int):
+        """Méthode gérant la requête pour supprimer l'utilisateur de la base de donnée et recharge le tableau.
+
+        Args:
+            user_id (int): L'ID de l'utilisateur à supprimer.
+        """
+        result = await self.api.delete_user(user_id)
+        result_code = await self.api.verify_request(result)
+
+        if result_code == self.api.Ok:
+            await self.load_users()
+            create_message_box(self, "Succès", f"Utilisateur {user_id} supprimé")
+        elif result_code == self.api.UserReconnected:
+            await self.delete_user_in_bdd(user_id)
+        elif result_code == self.api.AccessTokenError:
+            create_message_box(self, "Erreur", "Votre connexion a expiré ! Veuillez vous reconnecter !", False, True)
+        elif result_code == self.api.OtherError:
+            print(result, "ViewUserPage.py | L.161")
+            create_message_box(self, "Erreur", f"Une erreur a été rencontrée lors de la suppression de l'utilisateur !",
+                               False, True)
+        elif result_code == self.api.ErrorNotFound:
+            print(result, "ViewUserPage.py | L.164")
+            create_message_box(self, "Erreur", f"L'utilisateur n'a pas pu être supprimé !", False, True)
 
     # ------------------------------------------------
     #   Méthode pour modifier un utilisateur.
@@ -191,11 +216,14 @@ class ViewUserPage(QWidget):
         email_edit = QLineEdit(email)
         telephone_edit = QLineEdit(telephone)
 
+        configure_line_edit(name_edit, first_name_edit, telephone_edit, email_edit)
+
         # Remplace les cellules par des widgets
-        self.user_table.setIndexWidget(self.model.index(row, 1), name_edit)
-        self.user_table.setIndexWidget(self.model.index(row, 2), first_name_edit)
-        self.user_table.setIndexWidget(self.model.index(row, 3), email_edit)
-        self.user_table.setIndexWidget(self.model.index(row, 4), telephone_edit)
+        colonne = 0
+        for edit in [name_edit, first_name_edit, email_edit, telephone_edit]:
+            edit.setStyleSheet("font-size: 17px;")
+            colonne += 1
+            self.user_table.setIndexWidget(self.model.index(row, colonne), edit)
 
         # Colonne Action : bouton "Enregistrer"
         index_action = self.model.index(row, 5)
@@ -203,12 +231,11 @@ class ViewUserPage(QWidget):
         layout = QHBoxLayout(save_widget)
         layout.setContentsMargins(0, 0, 0, 0)
 
-        btn_save = QPushButton("💾 Enregistrer")
-        btn_save.setObjectName("btn_save")
-        btn_save.setFocusPolicy(Qt.FocusPolicy.NoFocus)
-
         # Au clic → envoyer les nouvelles données à l’API
         async def save_changes():
+            """
+            Méthode interne gérant la requête pour modifier l'utilisateur côté base de donnée.
+            """
             new_data = {
                 "name": name_edit.text(),
                 "first_name": first_name_edit.text(),
@@ -218,16 +245,36 @@ class ViewUserPage(QWidget):
             print("Nouvelles données :", new_data)
 
             result = await self.api.update_user(user_id, new_data)
-            if isinstance(result, dict) and "err" in result:
-                print("❌ Erreur :", result["err"])
-            else:
-                print("✅ Modifié avec succès !")
-                # Recharge la ligne pour repasser en mode lecture
+            result_code = await self.api.verify_request(result)
+
+            # Vérification de la requête.
+            if result_code == self.api.Ok:
+                await self.load_users()
+                print("Modification réussi !")
+            elif result_code == self.api.UserReconnected:
+                await save_changes()
+            elif result_code == self.api.AccessTokenError:
+                create_message_box(self, "Erreur", "Votre connexion a expiré ! Veuillez vous reconnecter !", False,
+                                   True)
+                await self.load_users()
+            elif result_code == self.api.OtherError:
+                print(result, "ViewUserPage.py | L.251")
+                if result["err"].message == "User already exists!":
+                    create_message_box(self, "Erreur",
+                                       "La modification que vous tentez de faire est déjà attribué à un utilisateur !",
+                                       False, True)
+                else:
+                    print(result, "ViewUserPage.py | L.255")
+                    create_message_box(self, "Erreur", "Une erreur inattendu a été détecté !", False,
+                                       True)
+                await self.load_users()
+            elif result_code == self.api.ErrorNotFound:
+                create_message_box(self, "Erreur", "Une erreur inattendu a été détecté !", False,
+                                   True)
                 await self.load_users()
 
-        btn_save.clicked.connect(lambda _: asyncio.create_task(save_changes()))
+        add_button_to_layout("💾 Enregistrer", "btn_save", layout, save_changes)
 
-        layout.addWidget(btn_save)
         self.user_table.setIndexWidget(index_action, save_widget)
 
     def _configure_user_table(self):
@@ -250,3 +297,31 @@ class ViewUserPage(QWidget):
         self.user_table.setAlternatingRowColors(True)
         self.user_table.setRootIsDecorated(False)
         self.user_table.setStyleSheet(load_qss_file("user_table.qss"))
+
+
+# ------------------------------------------------
+#   Fonction utilitaire.
+# ------------------------------------------------
+def add_button_to_layout(name: str, object_name: str, layout: QHBoxLayout, action, user_id: int = 0,
+                         icon: QIcon = None):
+    """Méthode pour ajouter un bouton sur le tableau
+
+    Args:
+        name (str): Nom du bouton.
+        object_name (str): Nom du style du bouton.
+        layout (QHBoxLayout): Le layout dont le bouton a été ajouté.
+        action: Action du bouton.
+        user_id (int): Optionnel, ID de l'utilisateur de la ligne du bouton.
+        icon (QIcon): Optionnel, Icon du bouton.
+    """
+    btn = QPushButton(name)
+    btn.setObjectName(object_name)
+    btn.setFocusPolicy(Qt.FocusPolicy.NoFocus)
+    if icon is not None:
+        btn.setIcon(icon)
+        btn.setIconSize(QSize(50, 50))
+    if user_id == 0:
+        btn.clicked.connect(lambda: asyncio.create_task(action()))
+    else:
+        btn.clicked.connect(lambda _, uid=user_id: asyncio.create_task(action(uid)))
+    layout.addWidget(btn)

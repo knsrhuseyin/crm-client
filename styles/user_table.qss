@@ -5,7 +5,7 @@ QHeaderView::section {
 }
 
 QTreeView {
-    font-size: 15px;
+    font-size: 20px;
     gridline-color: white;
     color: white;
 }
@@ -52,6 +52,7 @@ QPushButton#btn_save {
    color: white;
    border-radius: 5px;
    font-size: 15px;
+   padding: 4px 8px;
 }
 
 QPushButton#btn_save:hover {

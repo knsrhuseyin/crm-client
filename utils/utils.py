@@ -16,9 +16,10 @@ import os
 from pathlib import Path
 from typing import List
 
+from PySide6.QtCore import QRegularExpression
 # import classes pyside6
-from PySide6.QtGui import QGuiApplication
-from PySide6.QtWidgets import QWidget, QBoxLayout
+from PySide6.QtGui import QGuiApplication, QRegularExpressionValidator, QIcon, QPixmap
+from PySide6.QtWidgets import QWidget, QBoxLayout, QMessageBox, QLineEdit
 
 
 def load_qss_file(filename: str) -> str:
@@ -105,3 +106,49 @@ def get_data_json(file_path: str):
         except json.JSONDecodeError as e:
             print(e)
             return None
+
+
+def create_message_box(parent: QWidget, title: str, text: str, question: bool = False, error: bool = False):
+    """Créer un QMessageBox en cas d'alerte dans l'application
+
+    Args:
+        parent (QWidget): Parent widget de l'application.
+        title (str): Titre du message box.
+        text (str): Text du message box.
+        question (bool, optional): Si c'est une question ou pas.
+    """
+    if question:
+        confirm = QMessageBox.question(parent, title, text, QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No)
+        if confirm == QMessageBox.StandardButton.Yes:
+            return True
+        else:
+            return False
+    else:
+        if error:
+            QMessageBox.critical(parent, title, text)
+            return None
+        else:
+            QMessageBox.information(parent, title, text)
+            return None
+
+
+def configure_line_edit(name_edit: QLineEdit, first_name_edit: QLineEdit, telephone_edit: QLineEdit, email_edit: QLineEdit):
+        validator_num = QRegularExpressionValidator(QRegularExpression(r"[0-9]{0,10}"))
+        validator_text = QRegularExpressionValidator(QRegularExpression(r"^[A-Za-zÀ-ÿ\s-]*$"))
+        validator_mail = QRegularExpressionValidator(QRegularExpression(r"^[A-Za-z0-9._@-]*$"))
+
+        for edit in [name_edit, first_name_edit, telephone_edit, email_edit]:
+            if edit == telephone_edit:
+                edit.setMaxLength(10)
+                edit.setValidator(validator_num)
+            elif edit == email_edit:
+                edit.setValidator(validator_mail)
+                edit.setMaxLength(50)
+            else:
+                edit.setMaxLength(100)
+                edit.setValidator(validator_text)
+
+
+def get_icon(file_name: str) -> QIcon:
+    image_path = Path(__file__).parent.parent / "assets" / Path(file_name)
+    return QIcon(str(image_path))

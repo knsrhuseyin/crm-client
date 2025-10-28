@@ -14,13 +14,30 @@ from PySide6.QtCore import Qt
 from PySide6.QtWidgets import QWidget, QVBoxLayout, QLabel, QFrame, QPushButton, QMessageBox
 
 from utils.CrmApiAsync import CrmApiAsync
+from utils.utils import load_qss_file
 
 
 class AccountPage(QWidget):
     """Classe de la page de gestion de l'utilisateur courant
 
+    Attributes:
+        api (CrmApiAsync): La classe cliente de l'API.
+        parent (QWidget): Parent de la page de la page AccountPage.
+        login_window (QWidget): La page de connexion pour rediriger après la déconnexion.
+        name_label (QLabel): Label du nom de l'utilisateur courant.
+        email_label (QLabel): Label de l'email de l'utilisateur courant.
+        role_label (QLabel): Label du rôle de l'utilisateur courant.
+        status_label (QLabel): Label du status de l'utilisateur courant.
+        disconnect_btn (QPushButton): Le bouton de déconnexion.
     """
-    def __init__(self, api: CrmApiAsync, parent, login_window):
+    def __init__(self, api: CrmApiAsync, parent: QWidget, login_window: QWidget):
+        """Le constructeur de la page AccountPage
+
+        Args:
+            api (CrmApiAsync): La classe cliente de l'API
+            parent (QWidget): Parent de la page AccountPage.
+            login_window (QWidget): La page de connexion.
+        """
         super().__init__()
         self.setWindowTitle("Informations du compte utilisateur")
         self.api = api
@@ -34,6 +51,9 @@ class AccountPage(QWidget):
         self.init_ui()
 
     def init_ui(self):
+        """
+        Constructeur de l'interface de AccountPage
+        """
         container = QWidget()
 
         layout = QVBoxLayout()
@@ -72,20 +92,8 @@ class AccountPage(QWidget):
 
         # Bouton d'actualisation
         self.disconnect_btn = QPushButton("Se deconnecter")
-        self.disconnect_btn.setStyleSheet("""
-            QPushButton {
-                background-color: #1E6091;
-                color: white;
-                border: none;
-                border-radius: 6px;
-                padding: 30px 60px;
-                font-weight: bold;
-                font-size: 30px;
-            }
-            QPushButton:hover {
-                background-color: #184E77;
-            }
-        """)
+        self.disconnect_btn.setObjectName("disconnect_btn")
+        self.disconnect_btn.setStyleSheet(load_qss_file("button_style.qss"))
         self.disconnect_btn.setCursor(Qt.CursorShape.PointingHandCursor)
         self.disconnect_btn.clicked.connect(self.disconnect)
 
@@ -110,6 +118,9 @@ class AccountPage(QWidget):
         self.setLayout(layout)
 
     async def load_current_user_info(self):
+        """
+        Méthode permettant de récupérer les informations de l'utilisateur courant.
+        """
         response = await self.api.get_current_user_access()
         response_code = await self.api.verify_request(response)
 
@@ -120,6 +131,9 @@ class AccountPage(QWidget):
             self.status_label.setText("Status : " + "Actif" if response["current_user"]["is_active"] else "Inactif")
 
     def disconnect(self):
+        """
+        Méthode permettant de déconnecter l'utilisateur courant et d'ouvrir la page de connexion.
+        """
         confirm = QMessageBox.question(
             self,
             "Confirmation",
