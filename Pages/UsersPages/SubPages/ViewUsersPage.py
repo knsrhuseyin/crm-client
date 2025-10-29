@@ -59,7 +59,7 @@ class ViewUserPage(QWidget):
 
         title_layout.addWidget(title)
         title_layout.addStretch()
-        add_button_to_layout("", "", title_layout, self.load_users, 0, get_icon("actualise.png"))
+        add_button_to_layout("", "", title_layout, self.load_users, get_icon("actualise.png"))
 
         layout.addWidget(title_container)
 
@@ -88,7 +88,8 @@ class ViewUserPage(QWidget):
         self.model.removeRows(0, self.model.rowCount())
 
         if requests_code == self.api.Ok:
-            self._add_users(requests_users_data)
+            for user in requests_users_data:
+                self._add_user_to_table(user)
         elif requests_code == self.api.AccessTokenError:
             QMessageBox.critical(self, "Erreur", f"Votre connexion a expiré ! Veuillez vous reconnecter !")
             self.info_label.setText("Votre connexion a expiré ! Veuillez vous reconnecter !")
@@ -125,26 +126,17 @@ class ViewUserPage(QWidget):
         layout.setContentsMargins(0, 0, 0, 0)
         layout.setSpacing(5)
 
-        add_button_to_layout("✏️ Modifier", "btn_edit", layout, self.update_user, user["id"])
-        add_button_to_layout("🗑 Supprimer", "btn_delete", layout, self.delete_user, user["id"])
+        add_button_to_layout(name="✏️ Modifier", object_name="btn_edit", layout=layout, action=self.update_user, user_id=user["id"])
+        add_button_to_layout(name="🗑 Supprimer", object_name="btn_delete", layout=layout, action=self.delete_user, user_id=user["id"])
 
         self.user_table.setIndexWidget(index, action_widget)
-
-    def _add_users(self, users: dict):
-        """Méthode permettant d'ajouter une liste d'utilisateur dans le tableau.
-
-        Args:
-            users (dict): Le dictionnaire des utilisateurs.
-        """
-        for user in users:
-            self._add_user_to_table(user)
 
     # ------------------------------------------------
     #   Méthode pour supprimer un utilisateur.
     # ------------------------------------------------
 
     async def delete_user(self, user_id: int):
-        """Méthode permettant de confirmer la suppression de l'utilisateur.
+        """Méthode permettant la suppression de l'utilisateur.
 
         Args:
             user_id (int): ID de l'utilisateur à supprimer.
@@ -154,29 +146,23 @@ class ViewUserPage(QWidget):
                                      True)
 
         if confirm:
-            await self.delete_user_in_bdd(user_id)
+            result = await self.api.delete_user(user_id)
+            result_code = await self.api.verify_request(result)
 
-    async def delete_user_in_bdd(self, user_id: int):
-        """Méthode gérant la requête pour supprimer l'utilisateur de la base de donnée et recharge le tableau.
-
-        Args:
-            user_id (int): L'ID de l'utilisateur à supprimer.
-        """
-        result = await self.api.delete_user(user_id)
-        result_code = await self.api.verify_request(result)
-
-        if result_code == self.api.Ok:
-            await self.load_users()
-            create_message_box(self, "Succès", f"Utilisateur {user_id} supprimé")
-        elif result_code == self.api.AccessTokenError:
-            create_message_box(self, "Erreur", "Votre connexion a expiré ! Veuillez vous reconnecter !", False, True)
-        elif result_code == self.api.OtherError:
-            print(result, "ViewUserPage.py | L.161")
-            create_message_box(self, "Erreur", f"Une erreur a été rencontrée lors de la suppression de l'utilisateur !",
-                               False, True)
-        elif result_code == self.api.ErrorNotFound:
-            print(result, "ViewUserPage.py | L.164")
-            create_message_box(self, "Erreur", f"L'utilisateur n'a pas pu être supprimé !", False, True)
+            if result_code == self.api.Ok:
+                await self.load_users()
+                create_message_box(self, "Succès", f"Utilisateur {user_id} supprimé")
+            elif result_code == self.api.AccessTokenError:
+                create_message_box(self, "Erreur", "Votre connexion a expiré ! Veuillez vous reconnecter !", False,
+                                   True)
+            elif result_code == self.api.OtherError:
+                print(result, "ViewUserPage.py | L.161")
+                create_message_box(self, "Erreur",
+                                   f"Une erreur a été rencontrée lors de la suppression de l'utilisateur !",
+                                   False, True)
+            elif result_code == self.api.ErrorNotFound:
+                print(result, "ViewUserPage.py | L.164")
+                create_message_box(self, "Erreur", f"L'utilisateur n'a pas pu être supprimé !", False, True)
 
     # ------------------------------------------------
     #   Méthode pour modifier un utilisateur.
@@ -230,7 +216,7 @@ class ViewUserPage(QWidget):
         # Au clic → envoyer les nouvelles données à l’API
         async def save_changes():
             """
-            Méthode interne gérant la requête pour modifier l'utilisateur côté base de donnée.
+            Fonction interne à la méthode update_user gérant la requête pour modifier l'utilisateur côté base de donnée.
             """
             new_data = {
                 "name": name_edit.text(),
@@ -267,13 +253,13 @@ class ViewUserPage(QWidget):
                                    True)
                 await self.load_users()
 
-        add_button_to_layout("💾 Enregistrer", "btn_save", layout, save_changes)
+        add_button_to_layout(name="💾 Enregistrer", object_name="btn_save", layout=layout, action=save_changes)
 
         self.user_table.setIndexWidget(index_action, save_widget)
 
     def _configure_user_table(self):
         """
-        Méthode qui configure le tableau des utilisateurs
+        Méthode qui configure le tableau des utilisateurs.
         """
         self.user_table.setColumnWidth(3, 225)
         self.user_table.setColumnWidth(4, 150)
@@ -296,17 +282,16 @@ class ViewUserPage(QWidget):
 # ------------------------------------------------
 #   Fonction utilitaire.
 # ------------------------------------------------
-def add_button_to_layout(name: str, object_name: str, layout: QHBoxLayout, action, user_id: int = 0,
-                         icon: QIcon = None):
-    """Méthode pour ajouter un bouton sur le tableau
+def add_button_to_layout(name: str, object_name: str, layout: QHBoxLayout, action, icon: QIcon = None, user_id: int = 0):
+    """Fonction pour ajouter un bouton dans un layout.
 
     Args:
         name (str): Nom du bouton.
         object_name (str): Nom du style du bouton.
         layout (QHBoxLayout): Le layout dont le bouton a été ajouté.
         action: Action du bouton.
-        user_id (int): Optionnel, ID de l'utilisateur de la ligne du bouton.
         icon (QIcon): Optionnel, Icon du bouton.
+        user_id (int): Optionnel, ID de l'utilisateur de la ligne du bouton.
     """
     btn = QPushButton(name)
     btn.setObjectName(object_name)

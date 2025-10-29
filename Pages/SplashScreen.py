@@ -77,7 +77,7 @@ class SplashScreen(QWidget):
         """
 
         async def fake_progress():
-            """Fonction mettant en oeuvre une fausse progression.
+            """Fonction mettant en œuvre une fausse progression.
 
             Fonction interne de la méthode verify_session.
             """

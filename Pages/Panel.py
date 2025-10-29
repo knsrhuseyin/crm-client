@@ -108,7 +108,7 @@ class AdminPanel(QWidget):
     """
 
     def __init__(self, api: CrmApiAsync, login_window):
-        """Constructeur de la page du Panel.
+        """Constructeur de l'affichage de l'AdminPanel.
 
         Args:
             api (CrmApiAsync): Classe cliente de l'API.

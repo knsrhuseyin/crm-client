@@ -18,7 +18,9 @@ from utils.utils import load_qss_file
 
 
 class AccountPage(QWidget):
-    """Classe de la page de gestion de l'utilisateur courant
+    """Classe de la page de gestion de l'utilisateur courant.
+
+    Hérite de QWidget.
 
     Attributes:
         api (CrmApiAsync): La classe cliente de l'API.
@@ -31,10 +33,10 @@ class AccountPage(QWidget):
         disconnect_btn (QPushButton): Le bouton de déconnexion.
     """
     def __init__(self, api: CrmApiAsync, parent: QWidget, login_window: QWidget):
-        """Le constructeur de la page AccountPage
+        """Le constructeur de la page AccountPage.
 
         Args:
-            api (CrmApiAsync): La classe cliente de l'API
+            api (CrmApiAsync): La classe cliente de l'API.
             parent (QWidget): Parent de la page AccountPage.
             login_window (QWidget): La page de connexion.
         """
@@ -52,7 +54,7 @@ class AccountPage(QWidget):
 
     def init_ui(self):
         """
-        Constructeur de l'interface de AccountPage
+        Constructeur de l'interface de AccountPage.
         """
         container = QWidget()
 
@@ -91,11 +93,11 @@ class AccountPage(QWidget):
             label.setStyleSheet("font-size: 30px; margin: 3px; color: #E0E1DD;")
 
         # Bouton d'actualisation
-        self.disconnect_btn = QPushButton("Se deconnecter")
+        self.disconnect_btn = QPushButton("Se déconnecter")
         self.disconnect_btn.setObjectName("disconnect_btn")
         self.disconnect_btn.setStyleSheet(load_qss_file("button_style.qss"))
         self.disconnect_btn.setCursor(Qt.CursorShape.PointingHandCursor)
-        self.disconnect_btn.clicked.connect(self.disconnect)
+        self.disconnect_btn.clicked.connect(self.disconnect_user_action)
 
         # Ajout au layout
         frame_layout.addWidget(self.name_label)
@@ -130,7 +132,7 @@ class AccountPage(QWidget):
             self.role_label.setText("Rôle : " + response["current_user"]["role"])
             self.status_label.setText("Status : " + "Actif" if response["current_user"]["is_active"] else "Inactif")
 
-    def disconnect(self):
+    def disconnect_user_action(self):
         """
         Méthode permettant de déconnecter l'utilisateur courant et d'ouvrir la page de connexion.
         """

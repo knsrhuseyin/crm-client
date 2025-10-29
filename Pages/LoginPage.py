@@ -6,7 +6,6 @@ Module qui contient la classe de la page de connexion.
 
 Dependencies:
     pyside6: Dépendance principale de l'application qui permet de créer des interfaces graphiques.
-    passlib: Pour crypter le mot de passe à sauvegarder.
 """
 
 # import de module
@@ -24,7 +23,9 @@ from utils.utils import load_qss_file, update_json_file, center_on_screen
 
 
 class LoginWindow(QWidget):
-    """Classe de la page de connexion
+    """Classe de la page de connexion.
+
+    Hérite de QWidget.
 
     Attributes:
         api (CrmApiAsync): Classe client de l'API.
@@ -55,7 +56,7 @@ class LoginWindow(QWidget):
 
     def init_ui(self):
         """
-        Constructeur de l'interface graphique de la page de connexion
+        Constructeur de l'interface graphique de la page de connexion.
         """
         self.setWindowTitle("Connexion")
         self.resize(1280, 720)
@@ -145,7 +146,7 @@ class LoginWindow(QWidget):
 
     # Afficher / masquer le mot de passe
     def toggle_password(self, state: int):
-        """Méthode permettant d'afficher ou de masquer le mot de passe
+        """Méthode permettant d'afficher ou de masquer le mot de passe.
 
         Args:
             state (int): Le status du champ.
@@ -157,7 +158,7 @@ class LoginWindow(QWidget):
 
     # Progression...
     def set_progress(self, text: str, error: bool):
-        """Méthode permettant de mettre à jour le label info_label
+        """Méthode permettant de mettre à jour le label info_label.
 
         Args:
             text (str): Texte du label info_label.

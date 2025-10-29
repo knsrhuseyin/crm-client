@@ -7,7 +7,6 @@ Ce module ajoute des fonctions utilitaires pour mieux gérer le style ou facilit
 Dependencies:
     pyside6: Module principal du programme
     json: Pour manipuler des fichiers json
-    passlib: Pour crypter et décrypter les mot de passes.
 """
 
 # import module

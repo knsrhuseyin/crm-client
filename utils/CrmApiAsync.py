@@ -30,7 +30,6 @@ class CrmApiAsync(Requests):
 
     Attributes:
         Ok (int): Code 200 signifiant que la requête a bien été réussi.
-        UserReconnected (int): Code 300 signifiant que l'utilisateur a été reconnecté suite à une expiration de clé.
         AccessTokenError (int): Code 400 signifiant que le token est expiré et que l'utilisateur n'a pas pu être reconnecté.
         OtherError (int): Code 450 signifiant qu'une erreur a été retrouvé lors de la requête.
         ErrorNotFound (int): Code 500 signifiant qu'une erreur externe a été retrouvé lors de la requête.
@@ -45,7 +44,7 @@ class CrmApiAsync(Requests):
         """Constructeur de la classe CrmApiAsync héritant de Requests.
 
         Args:
-            base_url (str): L'url de l'API.
+            base_url (str): L'URL de l'API.
             headers (Optional[Dict[str, str]]): La clé qui est définie généralement dans la classe CrmApiAsync.
             auth_file (str): Destination du fichier stockant les informations d'authentifications.
         """
@@ -53,7 +52,7 @@ class CrmApiAsync(Requests):
         self.auth_file = auth_file
 
     async def login(self, email, password, progress_callback=None) -> dict:
-        """La méthode qui nous permet de nous connecter à l'API.
+        """La méthode qui permet de se connecter à l'API.
 
         Cette fonction doit être appelée avec await.
 
@@ -61,6 +60,9 @@ class CrmApiAsync(Requests):
             email (str): l'email de l'utilisateur client.
             password (str): le mot de passe de l'utilisateur client.
             progress_callback (Optional[None]]): Paramètre permettant de donner la progression de la requête.
+
+        Returns:
+            dict: réponse de la requête qui contient notamment l'access token sinon l'erreur rencontrée.
         """
         try:
             response = await self.post("auth/token", data={"username": email, "password": password},
@@ -200,7 +202,7 @@ class CrmApiAsync(Requests):
             dict: Renvoie l'utilisateur courant sinon l'erreur rencontrée.
         """
         access_token_error = DotMap()
-        access_token_error.err.message = "Could not verify creditials"
+        access_token_error.err.message = "Could not verify credentials"
         if self.headers is not None:
             try:
                 return await self.get("crm", headers=self.headers, progress_callback=progress_callback)
@@ -231,7 +233,7 @@ class CrmApiAsync(Requests):
             return self.Ok
         else:
             if hasattr(response["err"], "message"):
-                if response["err"].message == "Could not verify creditials":
+                if response["err"].message == "Could not verify credentials":
                     return self.AccessTokenError
                 else:
                     return self.OtherError
