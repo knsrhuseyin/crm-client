@@ -53,7 +53,7 @@ class SplashScreen(QWidget):
         """
         Constructeur de l'interface graphique de la page SplashScreen.
         """
-        self.setWindowTitle("Chargement...")
+        self.setWindowTitle("Splash CRM")
         self.resize(300, 150)
         self.setWindowFlags(Qt.WindowType.FramelessWindowHint | Qt.WindowType.WindowStaysOnTopHint)
         self.setStyleSheet("background-color: #222; color: white;")

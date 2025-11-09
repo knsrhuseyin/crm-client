@@ -16,7 +16,7 @@ from PySide6.QtWidgets import QWidget, QVBoxLayout, QLabel, QSizePolicy, QStacke
 from Pages.AccountPage.AccountPage import AccountPage
 from Pages.UsersPages.UserManagement import UserManagement
 from utils.CrmApiAsync import CrmApiAsync
-from utils.utils import load_qss_file, center_on_screen
+from utils.utils import load_qss_file, center_on_screen, get_icon
 
 
 class MenuWidget(QListWidget):
@@ -66,13 +66,24 @@ class Panel(QWidget):
         layout = QVBoxLayout()
         layout_container = QVBoxLayout(container)
 
-        title = QLabel("Admin Panel", alignment=Qt.AlignmentFlag.AlignCenter)
-        title.setStyleSheet("""padding: 10; font-size: 20px; margin:10; font-weight: bold;""")
+        icon_widget = QWidget()
+        icon_layout = QHBoxLayout(icon_widget)
+
+        title_icon = QLabel()
+        title_icon.setPixmap(get_icon("icon.ico", True).scaled(48, 48))
+        title_icon.setStyleSheet("""padding: 10; font-size: 20px; margin:10; font-weight: bold;""")
+
+        title = QLabel("AdminPanel")
+        title.setStyleSheet("font-size: 24px;")
+
+        icon_layout.addWidget(title_icon)
+        icon_layout.addWidget(title)
+        icon_layout.addStretch()
 
         creator = QLabel("Created by knsrhuseyin", alignment=Qt.AlignmentFlag.AlignCenter)
         creator.setStyleSheet("""padding: 5; font-size: 15px; margin-bottom:5; color: gray;""")
 
-        layout_container.addWidget(title)
+        layout_container.addWidget(icon_widget)
         layout_container.addWidget(self.menu)
         layout_container.addWidget(creator)
 
@@ -115,6 +126,7 @@ class AdminPanel(QWidget):
         """
         super().__init__()
         self.resize(1280, 720)
+        self.setWindowTitle("CRM Client")
         center_on_screen(self)
 
         self.pages = QStackedWidget()

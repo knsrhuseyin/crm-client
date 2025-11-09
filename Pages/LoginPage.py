@@ -58,7 +58,7 @@ class LoginWindow(QWidget):
         """
         Constructeur de l'interface graphique de la page de connexion.
         """
-        self.setWindowTitle("Connexion")
+        self.setWindowTitle("CRM Client")
         self.resize(1280, 720)
         center_on_screen(self)
 

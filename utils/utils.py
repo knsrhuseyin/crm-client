@@ -157,11 +157,14 @@ def configure_line_edit(name_edit: QLineEdit, first_name_edit: QLineEdit, teleph
             edit.setValidator(validator_text)
 
 
-def get_icon(file_name: str) -> QIcon:
-    """Fonction qui permet de retourner une icon  notamment pour mettre des icons dans les boutons.
+def get_icon(file_name: str, is_pixmap: bool = False) -> QIcon | QPixmap:
+    """Fonction qui permet de retourner une icon notamment pour mettre des icons dans les boutons.
 
     Args:
         file_name (str): Nom du fichier.
+        is_pixmap (bool): si utilisé dans un label. False par défaut.
     """
     image_path = Path(__file__).parent.parent / "assets" / Path(file_name)
+    if is_pixmap:
+        return QPixmap(str(image_path))
     return QIcon(str(image_path))

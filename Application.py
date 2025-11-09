@@ -19,6 +19,7 @@ from PySide6.QtWidgets import QApplication
 # import interne au programme.
 from Pages.SplashScreen import SplashScreen
 from utils.CrmApiAsync import CrmApiAsync
+from utils.utils import get_icon
 
 
 def main():
@@ -26,6 +27,7 @@ def main():
     Fonction principale permettant l'ouverture de l'application en ouvrant le Splash Screen.
     """
     app = QApplication([])
+    app.setWindowIcon(get_icon("icon.ico"))
     loop = qasync.QEventLoop(app)
     asyncio.set_event_loop(loop)
     api = CrmApiAsync("https://api-crm.knsr-family.com", "auth.json")
