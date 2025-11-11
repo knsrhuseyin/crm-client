@@ -2,16 +2,23 @@
 Panel.py
 ========
 
-Ce module contient la géstion et le design du panel administrateur.
+Module gérant le panel administrateur et le menu de navigation.
 
 Dependencies:
-    pyside6: Module principal du programme.
+    PySide6: Module principal pour l'interface graphique.
 """
 
-# import des classes de pyside6
 from PySide6.QtCore import Qt
-from PySide6.QtWidgets import QWidget, QVBoxLayout, QLabel, QSizePolicy, QStackedWidget, QHBoxLayout, QListWidgetItem, \
-    QListWidget
+from PySide6.QtWidgets import (
+    QWidget,
+    QVBoxLayout,
+    QLabel,
+    QSizePolicy,
+    QStackedWidget,
+    QHBoxLayout,
+    QListWidgetItem,
+    QListWidget,
+)
 
 from Pages.AccountPage.AccountPage import AccountPage
 from Pages.UsersPages.UserManagement import UserManagement
@@ -20,15 +27,13 @@ from utils.utils import load_qss_file, center_on_screen, get_icon
 
 
 class MenuWidget(QListWidget):
-    """Cette classe permet d'ajouter les éléments qui seront contenus dans le menu de l'admin panel.
+    """Menu latéral du panel administrateur.
 
-    Hérite de QListWidget
+    Hérite de QListWidget et contient les items du menu.
     """
 
     def __init__(self):
-        """
-        Constructeur du menu de l'admin panel
-        """
+        """Initialise le menu avec les éléments prédéfinis."""
         super().__init__()
         self.setFixedWidth(300)
         self.addItem(QListWidgetItem("Gestion des utilisateurs"))
@@ -39,39 +44,36 @@ class MenuWidget(QListWidget):
 
 
 class Panel(QWidget):
-    """Classe gérant le changement de page du Panel.
-
-    Hérite de QWidget.
+    """Widget du panel contenant le menu et gérant le changement de page.
 
     Attributes:
-        menu (MenuWidget): La classe MenuWidget qu'on a créé ultérieurement.
-        stacked_widget (QStackedWidget): La classe qui contient les pages accessible via le panel et nous permet de changer la page.
+        menu (MenuWidget): Menu de navigation.
+        stacked_widget (QStackedWidget): Conteneur des pages accessibles via le panel.
     """
 
     def __init__(self, stacked_widget: QStackedWidget):
-        """Constructeur du panel.
+        """Initialise le panel avec le menu et la structure graphique.
 
         Args:
-            stacked_widget (QStackedWidget): classe qui contient les pages accessible via le panel
+            stacked_widget (QStackedWidget): Conteneur des pages.
         """
         super().__init__()
 
         self.menu = MenuWidget()
         self.stacked_widget = stacked_widget
-
         self.menu.currentRowChanged.connect(self.change_page)
 
         container = QWidget()
-
         layout = QVBoxLayout()
         layout_container = QVBoxLayout(container)
 
+        # Section icône et titre
         icon_widget = QWidget()
         icon_layout = QHBoxLayout(icon_widget)
 
         title_icon = QLabel()
         title_icon.setPixmap(get_icon("icon.ico", True).scaled(48, 48))
-        title_icon.setStyleSheet("""padding: 10; font-size: 20px; margin:10; font-weight: bold;""")
+        title_icon.setStyleSheet("padding: 10px; font-size: 20px; margin: 10px; font-weight: bold;")
 
         title = QLabel("AdminPanel")
         title.setStyleSheet("font-size: 24px;")
@@ -80,9 +82,11 @@ class Panel(QWidget):
         icon_layout.addWidget(title)
         icon_layout.addStretch()
 
-        creator = QLabel("Created by knsrhuseyin", alignment=Qt.AlignmentFlag.AlignCenter)
-        creator.setStyleSheet("""padding: 5; font-size: 15px; margin-bottom:5; color: gray;""")
+        # Footer créateur/version
+        creator = QLabel("Created by knsrhuseyin | Version 1.1.0", alignment=Qt.AlignmentFlag.AlignCenter)
+        creator.setStyleSheet("padding: 5px; font-size: 15px; margin-bottom:5px; color: gray;")
 
+        # Assemblage layout
         layout_container.addWidget(icon_widget)
         layout_container.addWidget(self.menu)
         layout_container.addWidget(creator)
@@ -90,7 +94,7 @@ class Panel(QWidget):
         layout_container.setContentsMargins(0, 0, 0, 0)
         layout_container.setSpacing(0)
 
-        container.setStyleSheet("""background: #081028;""")
+        container.setStyleSheet("background: #081028;")
         container.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
         layout.addWidget(container)
 
@@ -101,43 +105,42 @@ class Panel(QWidget):
         self.setLayout(layout)
 
     def change_page(self, index: int):
-        """Méthode permettant de changer la page affichée dans le QStackedWidget.
+        """Change la page affichée dans le QStackedWidget.
 
         Args:
-            index (int): Chiffre permettant d'indiquer la page à afficher.
+            index (int): Index de la page à afficher.
         """
         self.stacked_widget.setCurrentIndex(index)
 
 
 class AdminPanel(QWidget):
-    """Classe de la page du Panel.
+    """Fenêtre principale du panel administrateur.
 
-    Hérite de QWidget.
-
-    Attributes:
-        pages (QStackedWidget): Les pages qui seront accessible via le panel sont ajoutés ici.
+    Contient le menu et les pages accessibles via le panel.
     """
 
     def __init__(self, api: CrmApiAsync, login_window):
-        """Constructeur de l'affichage de l'AdminPanel.
+        """Initialise la fenêtre AdminPanel.
 
         Args:
-            api (CrmApiAsync): Classe cliente de l'API.
+            api (CrmApiAsync): Client API pour la communication avec le backend.
+            login_window (QWidget): Fenêtre de login, pour référence dans AccountPage.
         """
         super().__init__()
         self.resize(1280, 720)
         self.setWindowTitle("CRM Client")
         center_on_screen(self)
 
+        # Création des pages accessibles
         self.pages = QStackedWidget()
         self.pages.addWidget(UserManagement(api))
         self.pages.addWidget(AccountPage(api, self, login_window))
 
+        # Layout principal
         layout = QHBoxLayout()
         layout.addWidget(Panel(self.pages))
         layout.addWidget(self.pages)
 
         layout.setContentsMargins(0, 0, 0, 0)
         layout.setSpacing(0)
-
         self.setLayout(layout)

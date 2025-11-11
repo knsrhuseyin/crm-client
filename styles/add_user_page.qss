@@ -6,11 +6,6 @@ QLineEdit {
     border-radius: 2px;
 }
 
-QLineEdit:hover {
-    border: 2px solid #61dafb;
-    background-color: #1b3350;
-}
-
 QLineEdit:focus {
     border: 2px solid #61dafb;
     background-color: #1b3350;

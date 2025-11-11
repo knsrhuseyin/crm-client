@@ -2,20 +2,19 @@
 LoginPage.py
 ============
 
-Module qui contient la classe de la page de connexion.
+Module contenant la page de connexion pour le CRM.
 
 Dependencies:
-    pyside6: Dépendance principale de l'application qui permet de créer des interfaces graphiques.
+    PySide6: Pour la création de l'interface graphique.
 """
 
-# import de module
 import asyncio
-
-# import des classes de Pyside6
 from PySide6.QtCore import Qt
 from PySide6.QtGui import QPalette, QColor, QFont
-from PySide6.QtWidgets import QWidget, QVBoxLayout, QLabel, QLineEdit, QSizePolicy, QPushButton, QFormLayout, QCheckBox, \
-    QSpacerItem, QFrame
+from PySide6.QtWidgets import (
+    QWidget, QVBoxLayout, QLabel, QLineEdit, QSizePolicy, QPushButton,
+    QFormLayout, QCheckBox, QSpacerItem, QFrame
+)
 
 from Pages.Panel import AdminPanel
 from utils.CrmApiAsync import CrmApiAsync
@@ -23,25 +22,26 @@ from utils.utils import load_qss_file, update_json_file, center_on_screen
 
 
 class LoginWindow(QWidget):
-    """Classe de la page de connexion.
+    """Page de connexion de l'application CRM.
 
     Hérite de QWidget.
 
     Attributes:
-        api (CrmApiAsync): Classe client de l'API.
-        email_input (QLineEdit): Le champ de l'email qui sera saisi par l'utilisateur.
-        password_input (QLineEdit): Le champ du mot de passe qui sera saisie par l'utilisateur.
-        info_label (QLabel): Le label qui informe l'état de la connexion.
-        show_password_cb (QCheckBox): Checkbox permettant de voir le mot de passe.
-        remember_cb (QCheckBox): Checkbox permettant d'enregistrer l'email et le mot de passe de l'utilisateur.
-        login_btn (QPushButton): Bouton permettant la connexion.
+        api (CrmApiAsync): Client API pour la communication avec le backend.
+        email_input (QLineEdit): Champ pour saisir l'email.
+        password_input (QLineEdit): Champ pour saisir le mot de passe.
+        info_label (QLabel): Label pour afficher l'état de la connexion.
+        show_password_cb (QCheckBox): Checkbox pour afficher/masquer le mot de passe.
+        remember_cb (QCheckBox): Checkbox pour mémoriser les identifiants.
+        login_btn (QPushButton): Bouton pour lancer la connexion.
+        admin_panel (AdminPanel | None): Fenêtre du panel administrateur après connexion réussie.
     """
 
     def __init__(self, api: CrmApiAsync):
-        """Constructeur de la page de connexion.
+        """Initialise la page de connexion.
 
         Args:
-            api (CrmApiAsync): Classe cliente de l'API.
+            api (CrmApiAsync): Client API.
         """
         super().__init__()
         self.api = api
@@ -55,19 +55,16 @@ class LoginWindow(QWidget):
         self.init_ui()
 
     def init_ui(self):
-        """
-        Constructeur de l'interface graphique de la page de connexion.
-        """
+        """Construit l'interface graphique de la page de connexion."""
         self.setWindowTitle("CRM Client")
         self.resize(1280, 720)
         center_on_screen(self)
 
-        # Thème général bleu sombre
+        # Palette et thème
         palette = QPalette()
         palette.setColor(QPalette.ColorRole.Window, QColor("#0d1b2a"))
         palette.setColor(QPalette.ColorRole.WindowText, QColor("#ffffff"))
         self.setPalette(palette)
-
         self.setFont(QFont("Segoe UI", 10))
 
         # Layout principal centré
@@ -76,8 +73,7 @@ class LoginWindow(QWidget):
 
         # Carte centrale
         card = QFrame()
-        card.setFixedWidth(400)
-        card.setFixedHeight(600)
+        card.setFixedSize(400, 600)
         card.setObjectName("card")
         card.setStyleSheet(load_qss_file("login_page.qss"))
 
@@ -86,15 +82,13 @@ class LoginWindow(QWidget):
         card_layout.setSpacing(20)
 
         # Titre
-        title = QLabel("Connexion à votre compte")
-        title.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        title = QLabel("Connexion à votre compte", alignment=Qt.AlignmentFlag.AlignCenter)
         title.setSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Fixed)
         title.setStyleSheet("font-size: 18px; font-weight: bold; color: #61dafb; padding: 15;")
         card_layout.addWidget(title)
-
         card_layout.addStretch()
 
-        # Formulaire
+        # Formulaire email / mot de passe
         form_layout = QFormLayout()
         form_layout.setContentsMargins(0, 0, 0, 0)
         form_layout.setSpacing(0)
@@ -112,10 +106,10 @@ class LoginWindow(QWidget):
         form_layout.addWidget(self.password_input)
         card_layout.addLayout(form_layout)
 
+        # Label info
         self.info_label = QLabel()
         self.info_label.setStyleSheet("font-size: 18px; font-weight: bold;")
         card_layout.addWidget(self.info_label, alignment=Qt.AlignmentFlag.AlignCenter)
-
         card_layout.addStretch()
 
         # Checkbox afficher le mot de passe
@@ -124,7 +118,7 @@ class LoginWindow(QWidget):
         self.show_password_cb.stateChanged.connect(self.toggle_password)
         card_layout.addWidget(self.show_password_cb)
 
-        # Checkbox se souvenir du mot de passe
+        # Checkbox se souvenir de l'utilisateur
         self.remember_cb = QCheckBox("Se souvenir de moi")
         self.remember_cb.setStyleSheet("color: #cdd6f4; font-size: 20px; padding: 5; margin-bottom: 30px;")
         card_layout.addWidget(self.remember_cb)
@@ -137,64 +131,58 @@ class LoginWindow(QWidget):
         self.login_btn.clicked.connect(lambda: asyncio.create_task(self.login()))
         card_layout.addWidget(self.login_btn)
 
-        # Centrer la carte
+        # Centrer la carte dans le layout principal
         main_layout.addSpacerItem(QSpacerItem(20, 20, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Expanding))
         main_layout.addWidget(card, alignment=Qt.AlignmentFlag.AlignCenter)
         main_layout.addSpacerItem(QSpacerItem(20, 20, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Expanding))
 
         self.setLayout(main_layout)
 
-    # Afficher / masquer le mot de passe
     def toggle_password(self, state: int):
-        """Méthode permettant d'afficher ou de masquer le mot de passe.
+        """Affiche ou masque le mot de passe.
 
         Args:
-            state (int): Le status du champ.
+            state (int): État de la checkbox.
         """
-        if state == 2:
-            self.password_input.setEchoMode(QLineEdit.EchoMode.Normal)
-        else:
-            self.password_input.setEchoMode(QLineEdit.EchoMode.Password)
+        self.password_input.setEchoMode(
+            QLineEdit.EchoMode.Normal if state == 2 else QLineEdit.EchoMode.Password
+        )
 
-    # Progression...
     def set_progress(self, text: str, error: bool):
-        """Méthode permettant de mettre à jour le label info_label.
+        """Met à jour le label d'information.
 
         Args:
-            text (str): Texte du label info_label.
-            error (bool): Si c'est une erreur ou pas.
+            text (str): Message à afficher.
+            error (bool): Si True, affiche le message en rouge.
         """
-        if error:
-            self.info_label.setStyleSheet("font-size: 18px; font-weight: bold; color: red;")
-            self.info_label.setText(text)
-        else:
-            self.info_label.setStyleSheet("font-size: 18px; font-weight: bold; color: white;")
-            self.info_label.setText(text)
+        color = "red" if error else "white"
+        self.info_label.setStyleSheet(f"font-size: 18px; font-weight: bold; color: {color};")
+        self.info_label.setText(text)
 
-    # Connexion
     async def login(self):
-        """
-        Méthode principale permettant de connecter le client à l'API appelé après l'actionnement du bouton login_btn.
-        """
+        """Tente de connecter l'utilisateur à l'API."""
         email = self.email_input.text()
         password = self.password_input.text()
 
-        if email == "" or password == "":
-            self.set_progress("Veuillez saisir vos identifiants !", False)
+        if not email or not password:
+            self.set_progress("Veuillez saisir vos identifiants !", True)
             return
 
         connexion = await self.api.login(email, password)
         connexion_code = await self.api.verify_request(connexion)
 
         if connexion_code == self.api.Ok:
-            self.info_label.setText("Connexion réussi !")
+            self.set_progress("Connexion réussie !", False)
             if self.remember_cb.isChecked():
                 update_json_file("auth.json", "access_token", connexion["access_token"])
             self.admin_panel = AdminPanel(self.api, LoginWindow(self.api))
             self.admin_panel.show()
             self.close()
+        elif connexion_code == self.api.ErrorDNS:
+            self.set_progress("Erreur de connexion\nVérifiez votre connexion internet !", True)
         elif connexion_code == self.api.OtherError:
-            if connexion["err"].message == "Wrong info !":
+            msg = getattr(connexion["err"], "message", "")
+            if msg == "Wrong info!":
                 self.set_progress("Les identifiants saisis sont incorrects !", True)
             else:
                 self.set_progress("Une erreur a été rencontrée lors de la connexion !", True)

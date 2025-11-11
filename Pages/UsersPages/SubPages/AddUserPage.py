@@ -13,12 +13,11 @@ import asyncio
 
 # import des classes de Pyside6
 from PySide6.QtCore import Qt, QRegularExpression
-from PySide6.QtGui import QRegularExpressionValidator
 from PySide6.QtWidgets import QWidget, QVBoxLayout, QLabel, QSizePolicy, QLineEdit, QPushButton
 
 from Pages.UsersPages.SubPages.ViewUsersPage import ViewUserPage
 from utils.CrmApiAsync import CrmApiAsync
-from utils.utils import load_qss_file, add_widgets
+from utils.utils import load_qss_file, add_widgets, configure_line_edit
 
 
 class AddUserPage(QWidget):
@@ -67,22 +66,9 @@ class AddUserPage(QWidget):
         self.email.setPlaceholderText("Email")
         self.telephone.setPlaceholderText("Telephone")
 
-        validator_num = QRegularExpressionValidator(QRegularExpression(r"[0-9]{0,10}"))
-        validator_text = QRegularExpressionValidator(QRegularExpression(r"^[A-Za-zÀ-ÿ\s-]*$"))
-        validator_mail = QRegularExpressionValidator(QRegularExpression(r"^[A-Za-z0-9._@-]*$"))
+        configure_line_edit(self.name, self.first_name, self.telephone, self.email)
 
-        for edit in [self.name, self.first_name, self.email, self.telephone]:
-            if edit == self.telephone:
-                edit.setMaxLength(10)
-                edit.setValidator(validator_num)
-            elif edit == self.email:
-                edit.setValidator(validator_mail)
-                edit.setMaxLength(50)
-            else:
-                edit.setMaxLength(100)
-                edit.setValidator(validator_text)
-
-        self.info_label = QLabel()
+        self.info_label = QLabel(alignment=Qt.AlignmentFlag.AlignCenter)
         self.info_label.setStyleSheet("""font-size: 20px;""")
 
         self.add_button = QPushButton("Ajouter l'utilisateur")
@@ -106,7 +92,7 @@ class AddUserPage(QWidget):
     #   Méthodes pour l'ajout de l'utilisateur
     # ------------------------------------------------------------
 
-    async def set_progress(self, text: str, button_enabled: bool = True):
+    def set_progress(self, text: str, button_enabled: bool = True):
         """Méthode permettant de mettre à jour la progression de l'ajout de l'utilisateur.
 
         Args:
@@ -120,7 +106,7 @@ class AddUserPage(QWidget):
         """
         Méthode liée au bouton pour permettre l'ajout de l'utilisateur.
         """
-        await self.set_progress("Chargement...", False)
+        self.set_progress("Chargement...", False)
         data = {
             "name": self.name.text(),
             "first_name": self.first_name.text(),
@@ -129,16 +115,16 @@ class AddUserPage(QWidget):
         }
 
         if data["name"] == "" or data["first_name"] == "" or data["email"] == "" or data["telephone"] == "":
-            await self.set_progress("Un des champs est vide !")
+            self.set_progress("Un des champs est vide !")
             return
         elif "@" not in data["email"]:
-            await self.set_progress("L'email est incorrect !")
+            self.set_progress("L'email est incorrect !")
             return
         elif not data["telephone"].isdigit() or len(data["telephone"]) != 10:
-            await self.set_progress("Le numéro de téléphone est incorrect !")
+            self.set_progress("Le numéro de téléphone est incorrect !")
             return
 
-        await self.set_progress("Chargement..", False)
+        self.set_progress("Chargement..", False)
         await self.add_user_to_database(data)
 
         self.add_button.setEnabled(True)
@@ -155,22 +141,25 @@ class AddUserPage(QWidget):
         # Vérification de la requête.
         if response_code == self.api.Ok:
             self.view_user_page.refresh_users.emit()
-            await self.set_progress("L'utilisateur a été ajouté avec succès !")
+            self.set_progress("L'utilisateur a été ajouté avec succès !")
+        elif response_code == self.api.ErrorDNS:
+            self.set_progress("Erreur de connexion\nVeuillez vérifiez votre connexion internet !")
+            return
         elif response_code == self.api.AccessTokenError:
-            await self.set_progress("Votre connexion a expiré ! Veuillez vous reconnecter !")
+            self.set_progress("Votre connexion a expiré ! Veuillez vous reconnecter !")
             return
         elif response_code == self.api.OtherError:
             if response["err"].message == 'User already exists!':
                 print(response["err"].message)
-                await self.set_progress("L'utilisateur existe déjà !")
+                self.set_progress("L'utilisateur existe déjà !")
                 return
             elif response["err"].message == "Not authenticated":
-                await self.set_progress("Vous n'êtes pas connecté !")
+                self.set_progress("Vous n'êtes pas connecté !")
             else:
                 print(response["err"].message)
-                await self.set_progress("Un problème est survenu !")
+                self.set_progress("Un problème imprévu est survenu !")
                 return
         elif response_code == self.api.ErrorNotFound:
             print(response)
-            await self.set_progress("Un problème est survenu !")
+            self.set_progress("Un problème imprévu est survenu !")
             return

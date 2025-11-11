@@ -4,32 +4,43 @@ Application.py
 
 Module principal permettant de lancer l'application.
 
+Ce module initialise la boucle événementielle asynchrone,
+configure l'interface graphique et lance l'écran de démarrage.
+
 Dependencies:
-    pyside6: Dépendance principale de l'application qui permet de créer des interfaces graphiques.
-    qasync: Dépendance permettant de rendre les interfaces graphiques asynchrones.
+    PySide6: Permet de créer des interfaces graphiques.
+    qasync: Rend l'interface graphique compatible avec asyncio.
 """
 
-# import de module
+# Imports standards
 import asyncio
 
+# Imports tiers
 import qasync
-# import de classe Pyside6.
 from PySide6.QtWidgets import QApplication
 
-# import interne au programme.
+# Imports internes
 from Pages.SplashScreen import SplashScreen
 from utils.CrmApiAsync import CrmApiAsync
 from utils.utils import get_icon
 
 
-def main():
-    """
-    Fonction principale permettant l'ouverture de l'application en ouvrant le Splash Screen.
+def main() -> None:
+    """Lance l'application en affichant le Splash Screen.
+
+    Cette fonction initialise l'application PySide6, configure la boucle
+    événementielle asynchrone avec qasync, et démarre l'écran d'accueil
+    avant de maintenir la boucle active.
+
+    Example:
+        >>> main()
+
     """
     app = QApplication([])
     app.setWindowIcon(get_icon("icon.ico"))
     loop = qasync.QEventLoop(app)
     asyncio.set_event_loop(loop)
+
     api = CrmApiAsync("https://api-crm.knsr-family.com", "auth.json")
 
     splash = SplashScreen(api)
@@ -40,5 +51,5 @@ def main():
 
 
 if __name__ == "__main__":
-    """Lancement du programme"""
+    # Point d'entrée du programme
     main()
