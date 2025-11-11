@@ -107,7 +107,7 @@ class LoginWindow(QWidget):
         card_layout.addLayout(form_layout)
 
         # Label info
-        self.info_label = QLabel()
+        self.info_label = QLabel(alignment=Qt.AlignmentFlag.AlignCenter)
         self.info_label.setStyleSheet("font-size: 18px; font-weight: bold;")
         card_layout.addWidget(self.info_label, alignment=Qt.AlignmentFlag.AlignCenter)
         card_layout.addStretch()
@@ -165,7 +165,7 @@ class LoginWindow(QWidget):
         password = self.password_input.text()
 
         if not email or not password:
-            self.set_progress("Veuillez saisir vos identifiants !", True)
+            self.set_progress("Veuillez saisir vos identifiants !", False)
             return
 
         connexion = await self.api.login(email, password)
